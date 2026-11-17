@@ -1,0 +1,3 @@
+import Link from "next/link";
+const links = [["Dashboard", "/student/dashboard"], ["My Profile", "/student/profile"], ["My Training", "/student/training"], ["Submit Report", "/student/upload-report"], ["Report History", "/student/submissions"], ["Notifications", "/student/notifications"], ["Help & Guidelines", "/student/help"]] as const;
+export function StudentWorkspaceNav({ active }: { active: string }) { return <nav className="student-nav" aria-label="Student portal">{links.map(([label, href]) => <Link key={href} aria-current={label === active ? "page" : undefined} href={href}>{label}</Link>)}</nav>; }

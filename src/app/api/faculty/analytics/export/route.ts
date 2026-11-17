@@ -1,0 +1,21 @@
+import ExcelJS from "exceljs";
+import { requirePermission } from "@/lib/auth/access";
+import { getFacultyOverview } from "@/lib/faculty/dashboard-data";
+const safe = (value: unknown) => { const text = String(value ?? ""); return /^\s*[=+\-@]/.test(text) ? `'${text}` : text; };
+export async function GET(request: Request) {
+  try {
+    await requirePermission("EXPORT"); const data = await getFacultyOverview(); const format = new URL(request.url).searchParams.get("format") ?? "csv";
+    if (format === "csv") {
+      const rows = [["Metric", "Value"], ["Active students", data.totalStudents], ["Active enrollments", data.totalEnrollments], ["Active training programs", data.activeTrainings], ["Reports submitted", data.reportsSubmitted], ["Pending reviews", data.pendingReviews], ["Overdue reports", data.overdue], ["Reporting compliance (%)", data.reportingCompliance], ["Overdue rate (%)", data.overduePercentage], ["Approval ratio (%)", data.approvalRatio], ...data.trainingSummaries.map((row) => [`Training ${row.code}`, `${row.students} students; ${row.submitted} reports; ${row.approved} approved; ${row.rejected} rejected/resubmission; ${row.approvalRate}% approval`]), ...data.departmentStats.map((row) => [`Department ${row.department}`, `${row.students} students; ${row.submissions} reports; ${row.approved} approved; ${row.rejected} rejected/resubmission`]), ...data.semesterStats.map((row) => [`Semester ${row.semester}`, `${row.students} students; ${row.submissions} reports; ${row.approved} approved; ${row.rejected} rejected/resubmission`])];
+      return new Response(rows.map((row) => row.map((value) => `"${safe(value).replaceAll('"', '""')}"`).join(",")).join("\r\n"), { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="gndec-training-analytics.csv"', "Cache-Control": "private, no-store" } });
+    }
+    if (format !== "xlsx") return Response.json({ error: "Choose CSV or Excel format." }, { status: 400 });
+    const book = new ExcelJS.Workbook();
+    const add = (name: string, columns: { header: string; key: string }[], rows: object[]) => { const sheet = book.addWorksheet(name); sheet.columns = columns.map((column) => ({ ...column, width: 24 })); sheet.addRows(rows.map((row) => Object.fromEntries(Object.entries(row).map(([key, value]) => [key, typeof value === "string" ? safe(value) : value])))); sheet.getRow(1).font = { bold: true }; };
+    add("Overview", [{ header: "Metric", key: "metric" }, { header: "Value", key: "value" }], [{ metric: "Active students", value: data.totalStudents }, { metric: "Active enrollments", value: data.totalEnrollments }, { metric: "Reporting compliance (%)", value: data.reportingCompliance }, { metric: "Overdue rate (%)", value: data.overduePercentage }, { metric: "Approval ratio (%)", value: data.approvalRatio }, { metric: "Pending reviews", value: data.pendingReviews }]);
+    add("Training", [{ header: "Training", key: "code" }, { header: "Students", key: "students" }, { header: "Reports", key: "submitted" }, { header: "Approved", key: "approved" }, { header: "Rejected / resubmission", key: "rejected" }, { header: "Approval rate (%)", key: "approvalRate" }, { header: "Overdue", key: "overdue" }], data.trainingSummaries);
+    add("Departments", [{ header: "Department", key: "department" }, { header: "Active students", key: "students" }, { header: "Reports", key: "submissions" }, { header: "Approved", key: "approved" }, { header: "Rejected / resubmission", key: "rejected" }], data.departmentStats);
+    add("Semesters", [{ header: "Semester", key: "semester" }, { header: "Active students", key: "students" }, { header: "Reports", key: "submissions" }, { header: "Approved", key: "approved" }, { header: "Rejected / resubmission", key: "rejected" }], data.semesterStats);
+    return new Response(await book.xlsx.writeBuffer(), { headers: { "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Content-Disposition": 'attachment; filename="gndec-training-analytics.xlsx"', "Cache-Control": "private, no-store" } });
+  } catch (error) { return Response.json({ error: error instanceof Error ? error.message : "Analytics export failed." }, { status: (error as { status?: number }).status ?? 400 }); }
+}
