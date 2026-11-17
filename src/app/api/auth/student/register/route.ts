@@ -6,6 +6,21 @@ export const dynamic = "force-dynamic";
 
 const GENERIC_RESPONSE = "If registration is eligible, a verification code will be sent to the GNDEC email address. Existing students can sign in instead.";
 
+function registrationFailureCode(error: unknown) {
+  if (!(error instanceof Error)) return "UnknownError";
+  if (error.message === "MONGODB_URI is required for this operation.") return "MONGODB_URI_MISSING";
+
+  const chain: string[] = [];
+  let current: unknown = error;
+  for (let depth = 0; depth < 3 && current instanceof Error; depth += 1) {
+    const code = "code" in current ? current.code : undefined;
+    const safeCode = typeof code === "string" || typeof code === "number" ? String(code).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) : "";
+    chain.push(`${current.name}${safeCode ? `_${safeCode}` : ""}`);
+    current = current.cause;
+  }
+  return chain.join("_CAUSED_BY_") || "RegistrationError";
+}
+
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin");
   // Compare against the active request origin so Vercel production and preview
@@ -30,8 +45,8 @@ export async function POST(request: NextRequest) {
     await requestOneTimeCode("STUDENT", parsed.data.email, ip);
     return Response.json({ message: GENERIC_RESPONSE }, { status: 202, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    const errorCode = error instanceof Error ? error.name : "RegistrationError";
-    console.error("Student registration could not be completed.", errorCode);
+    const errorCode = registrationFailureCode(error);
+    console.error("Student registration could not be completed.", { errorCode });
     if (error instanceof Error && (error.message.includes("configured") || error.message.includes("domain"))) {
       return Response.json({ error: error.message }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }
