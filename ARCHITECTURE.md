@@ -11,7 +11,7 @@ The workspace was empty at the start of this work: no app source, dependency man
 - **Data:** MongoDB Atlas/Mongoose. Server-only services own queries and domain rules; schemas define validation, timestamps, soft deletion and indexes.
 - **Files:** private S3-compatible bucket (Cloudflare R2), random object keys, MIME/extension/size validation, short-lived signed downloads, metadata only in MongoDB.
 - **Forms and exports:** Zod + React Hook Form; server-side paginated TanStack tables; CSV generation first, with Excel/PDF added when requested and dependency choice is justified.
-- **Operations:** Vercel-compatible route handlers and scheduled cron endpoint protected by a secret; notifications use idempotency keys and Resend. Cron and notifications are optional until provider credentials and deployment schedules are configured.
+- **Operations:** Vercel-compatible route handlers and scheduled cron endpoint protected by a secret; notifications use idempotency keys and Brevo transactional email. Cron and notifications are optional until provider credentials and deployment schedules are configured.
 
 ## Data model
 
@@ -69,7 +69,7 @@ Training configuration generates date-bounded reporting periods on the server, i
 
 ## External configuration required
 
-MongoDB Atlas URI, Auth.js secret and production URL, private S3/R2 endpoint/bucket/credentials, Resend API key and verified sender, and deployment cron schedule/secret. `.env.example` records the names; no secrets are present. Domain/email policy, verified institutional content, and initial teacher provisioning method are still required for production rollout.
+MongoDB Atlas URI, Auth.js secret and production URL, private S3/R2 endpoint/bucket/credentials, Brevo API key and verified sender, and deployment cron schedule/secret. `.env.example` records the names; no secrets are present. Domain/email policy, verified institutional content, and initial teacher provisioning method are still required for production rollout.
 
 ## Phase 2 implementation status
 
@@ -83,18 +83,18 @@ Implemented the persistent faculty workspace shell, responsive/collapsible navig
 
 ## Remaining development implementation status
 
-- Auth.js includes teacher/student OTP and password providers. Student sign-in/registration requires `@gndec.ac.in`; teacher sign-in/provisioning requires a Gmail address. Both roles use their registered email for OTP and password. OTPs are six-digit cryptographic values; only keyed digests are stored, with atomic one-time consumption, attempt limits, cooldowns, account/IP rate limits, generic account responses, and delivery records that do not include codes. Student self-registration creates a pending account with a bcrypt password hash and activates it only after email OTP verification. Teacher self-registration remains unavailable. Resend delivery is unavailable until provider configuration is supplied.
+- Auth.js includes teacher/student OTP and password providers. Student sign-in/registration requires `@gndec.ac.in`; teacher sign-in/provisioning requires a Gmail address. Both roles use their registered email for OTP and password. OTPs are six-digit cryptographic values; only keyed digests are stored, with atomic one-time consumption, attempt limits, cooldowns, account/IP rate limits, generic account responses, and delivery records that do not include codes. Student self-registration creates a pending account with a bcrypt password hash and activates it only after email OTP verification. Teacher self-registration remains unavailable. Brevo delivery is unavailable until provider configuration is supplied.
 - Student routes provide an ownership-scoped dashboard, training/period detail, upload, report history, notifications, help, and contact-only self-service profile editing. Faculty can create/edit students, change status, assign multiple training programs, inspect reporting history, and import up to 1,000 CSV/XLSX rows after row validation and preview. Import executes transactionally.
 - Faculty can configure training details and reporting windows, extend deadlines, and close periods. Windows use Asia/Kolkata calendar dates and include a partial final window. Duplicate training/sequence records are not overwritten.
 - Student PDF transfer uses a 120-second signed private-storage upload to a pending prefix. The server verifies storage metadata, owner, period, content type, signature and size before promoting the object to its permanent private key. Authorized reads redirect to 60-second signed URLs. A bucket lifecycle rule should remove abandoned `pending-uploads/` objects.
 - Faculty can move reports into review, approve, reject, or request resubmission with required feedback. Revisions and review events remain in MongoDB; actions check the assigned training on the server. Report exports support CSV and Excel.
-- A protected cron endpoint creates idempotent five-day, two-day, due-day and overdue in-app reminders and tracks Resend delivery attempts. Faculty settings configure allowed email domains, OTP limits, upload limit, reporting cadence, initial date, reminder email toggle, and editable training details. API/storage credentials remain environment-only.
+- A protected cron endpoint creates idempotent five-day, two-day, due-day and overdue in-app reminders and tracks Brevo delivery attempts. Faculty settings configure allowed email domains, OTP limits, upload limit, reporting cadence, initial date, reminder email toggle, and editable training details. API/storage credentials remain environment-only.
 - Controlled CLI commands provision the first teacher and update faculty access. The access updater requires an active, institution-wide training manager and writes the permission change and audit record in one Atlas transaction.
 - A small Node test suite covers OTP crypto helpers, reporting-window calculation, review transitions and PDF signatures. This is not an integration or end-to-end suite.
 
 ## Verification and operational limits
 
-`npx tsc --noEmit`, `npm run lint`, `npm test`, and `npm run build -- --webpack` pass in the current workspace. MongoDB Atlas, Resend delivery, R2/S3 uploads, signed downloads, scheduled production execution, and real teacher/student session flows are implemented but were not live-tested because credentials and institutional data were not configured. The `.env.example` file contains variable names only. Provider secrets should be rotated if they have ever been exposed outside the provider console.
+`npx tsc --noEmit`, `npm run lint`, `npm test`, and `npm run build -- --webpack` pass in the current workspace. MongoDB Atlas, Brevo delivery, R2/S3 uploads, signed downloads, scheduled production execution, and real teacher/student session flows are implemented but were not live-tested because credentials and institutional data were not configured. The `.env.example` file contains variable names only. Provider secrets should be rotated if they have ever been exposed outside the provider console.
 
 Production requires Atlas transactions and a one-time index sync. Browser-to-bucket uploads require exact-origin CORS for PUT and the signed metadata headers. The scheduled route requires `CRON_SECRET`; `vercel.json` schedules it daily. Configure an explicit institutional retention policy before loading real student data. No PDF report binary is stored in MongoDB.
 

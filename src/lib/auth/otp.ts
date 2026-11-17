@@ -8,7 +8,7 @@ import { OtpChallenge } from "@/models/otp-challenge";
 import { RateLimitBucket } from "@/models/rate-limit-bucket";
 import { AuditLog } from "@/models/audit-log";
 import { Notification } from "@/models/notification";
-import { sendOtpEmail } from "@/lib/email/resend";
+import { sendOtpEmail } from "@/lib/email/brevo";
 import { studentEmailSchema, teacherEmailSchema } from "@/lib/auth/validation";
 import { createOtpCode, hashOtp, hashRateKey, timingSafeHashEqual } from "@/lib/auth/otp-crypto";
 export { createOtpCode, hashOtp, hashRateKey, normalizeClientIp, timingSafeHashEqual } from "@/lib/auth/otp-crypto";

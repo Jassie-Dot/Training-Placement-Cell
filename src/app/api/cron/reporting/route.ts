@@ -6,7 +6,7 @@ import { ReportingPeriod } from "@/models/reporting-period";
 import { Report } from "@/models/report";
 import { Student } from "@/models/student";
 import { Notification } from "@/models/notification";
-import { sendNotificationEmail } from "@/lib/email/resend";
+import { sendNotificationEmail } from "@/lib/email/brevo";
 import { getPortalSettings, isInstitutionalEmail } from "@/lib/config/system-settings";
 function authorized(request: Request) { const secret = process.env.CRON_SECRET; const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? ""; if (!secret || !token) return false; const a = createHash("sha256").update(secret).digest(); const b = createHash("sha256").update(token).digest(); return timingSafeEqual(a, b); }
 function localDay(date: Date) { return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(date); }
