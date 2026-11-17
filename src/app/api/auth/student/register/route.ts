@@ -8,8 +8,9 @@ const GENERIC_RESPONSE = "If registration is eligible, a verification code will 
 
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin");
-  const expectedOrigin = process.env.APP_BASE_URL ? new URL(process.env.APP_BASE_URL).origin : request.nextUrl.origin;
-  if (!origin || origin !== expectedOrigin) return Response.json({ error: "Request could not be completed." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+  // Compare against the active request origin so Vercel production and preview
+  // deployments do not depend on a stale localhost APP_BASE_URL value.
+  if (!origin || origin !== request.nextUrl.origin) return Response.json({ error: "Request could not be completed." }, { status: 403, headers: { "Cache-Control": "no-store" } });
   if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) return Response.json({ error: "Request could not be completed." }, { status: 415, headers: { "Cache-Control": "no-store" } });
   try {
     const ip = normalizeClientIp(request.headers);

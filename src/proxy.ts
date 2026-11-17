@@ -5,7 +5,8 @@ import { auth } from "@/auth";
 export default auth((request) => {
   const path = request.nextUrl.pathname;
   const requiredRole = path.startsWith("/faculty") ? "TEACHER" : path.startsWith("/student") ? "STUDENT" : null;
-  if (!requiredRole || path.endsWith("/login")) return;
+  const isPublicAuthPage = path === "/faculty/login" || path === "/faculty/register" || path === "/student/login" || path === "/student/register";
+  if (!requiredRole || isPublicAuthPage) return;
   const role = request.auth?.user?.role;
   if (role !== requiredRole) {
     const target = role === "TEACHER" ? "/faculty/dashboard" : role === "STUDENT" ? "/student/dashboard" : requiredRole === "TEACHER" ? "/faculty/login" : "/student/login";

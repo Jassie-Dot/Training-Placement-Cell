@@ -8,8 +8,9 @@ const requestSchema = z.object({ role: z.enum(["TEACHER", "STUDENT"]), identifie
 
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin");
-  const expectedOrigin = process.env.APP_BASE_URL ? new URL(process.env.APP_BASE_URL).origin : request.nextUrl.origin;
-  if (origin && origin !== expectedOrigin) return Response.json({ error: "Request could not be completed." }, { status: 403 });
+  // Use the current host for same-origin protection; APP_BASE_URL can be stale
+  // on Vercel preview deployments and should not block legitimate login flows.
+  if (!origin || origin !== request.nextUrl.origin) return Response.json({ error: "Request could not be completed." }, { status: 403, headers: { "Cache-Control": "no-store" } });
   if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) return Response.json({ error: "Request could not be completed." }, { status: 415 });
   try {
     const raw = await request.json();
