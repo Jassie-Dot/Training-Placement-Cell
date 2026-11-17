@@ -73,6 +73,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
   },
-  trustHost: process.env.NODE_ENV !== "production" || Boolean(process.env.AUTH_URL),
+  // Auth.js can trust Vercel's platform-provided host. For other production
+  // reverse proxies, require explicit AUTH_TRUST_HOST=true or AUTH_URL.
+  trustHost: process.env.NODE_ENV !== "production" || process.env.VERCEL === "1" || process.env.AUTH_TRUST_HOST === "true" || Boolean(process.env.AUTH_URL),
   secret: authSecret,
 });
