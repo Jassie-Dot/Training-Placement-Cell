@@ -9,7 +9,6 @@ import { Faculty } from "@/models/faculty";
 import { normalizeClientIp, verifyOneTimeCode } from "@/lib/auth/otp";
 
 const authSecret = process.env.AUTH_SECRET;
-if (!authSecret) throw new Error("AUTH_SECRET must be configured before the authentication service starts.");
 
 const credentialProvider = (id: "teacher" | "student", role: "TEACHER" | "STUDENT") => Credentials({
   id,
