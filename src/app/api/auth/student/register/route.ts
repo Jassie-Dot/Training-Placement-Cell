@@ -23,8 +23,10 @@ export async function POST(request: NextRequest) {
     catch { return Response.json({ error: "Registration details are invalid." }, { status: 400, headers: { "Cache-Control": "no-store" } }); }
     const parsed = parseStudentRegistration(raw);
     if (!parsed.success) return Response.json({ error: parsed.error }, { status: 400, headers: { "Cache-Control": "no-store" } });
-    const result = await createStudentAccount(parsed.data);
-    if (result.created) await requestOneTimeCode("STUDENT", parsed.data.email, ip);
+    await createStudentAccount(parsed.data);
+    // Also resend for an existing eligible account so users can recover from
+    // a registration attempt where the account was created but delivery failed.
+    await requestOneTimeCode("STUDENT", parsed.data.email, ip);
     return Response.json({ message: GENERIC_RESPONSE }, { status: 202, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const errorCode = error instanceof Error ? error.name : "RegistrationError";
