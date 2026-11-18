@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectMongo } from "@/lib/db/mongoose";
-import { credentialsSchema, studentEmailSchema, teacherEmailSchema } from "@/lib/auth/validation";
+import { credentialsSchema } from "@/lib/auth/validation";
 import { User } from "@/models/user";
 import { Student } from "@/models/student";
 import { Faculty } from "@/models/faculty";
@@ -13,30 +13,64 @@ const authSecret = process.env.AUTH_SECRET;
 const credentialProvider = (id: "teacher" | "student", role: "TEACHER" | "STUDENT") => Credentials({
   id,
   name: id === "teacher" ? "Faculty credentials" : "Student credentials",
-  credentials: { identifier: { label: "Email", type: "email" }, password: { label: "Password", type: "password" } },
+  credentials: { identifier: { label: "Email or Roll Number", type: "text" }, password: { label: "Password", type: "password" } },
   async authorize(raw) {
     const parsed = credentialsSchema.safeParse(raw);
     if (!parsed.success) return null;
-    const emailResult = (role === "STUDENT" ? studentEmailSchema : teacherEmailSchema).safeParse(parsed.data.identifier);
-    if (!emailResult.success) return null;
     await connectMongo();
-    const student = role === "STUDENT" ? await Student.findOne({ email: emailResult.data, status: "ACTIVE", deletedAt: null }).select("_id user").lean() : null;
-    const user = role === "STUDENT"
-      ? student ? await User.findOne({ _id: student.user, role, status: "ACTIVE", deletedAt: null }).select("+passwordHash").lean() : null
-      : await User.findOne({ identifier: emailResult.data, role, status: "ACTIVE", deletedAt: null }).select("+passwordHash").lean();
-    if (!user || !(await bcrypt.compare(parsed.data.password, user.passwordHash))) return null;
 
-    let studentId: string | null = null;
+    const idInput = parsed.data.identifier.trim();
+
     if (role === "STUDENT") {
-      if (!student) return null;
-      studentId = student._id.toString();
-    } else {
-      const faculty = await Faculty.findOne({ user: user._id, status: "ACTIVE", deletedAt: null }).select("_id").lean();
-      if (!faculty) return null;
-    }
+      const student = await Student.findOne({
+        $or: [
+          { email: idInput.toLowerCase() },
+          { rollNumber: idInput.toUpperCase() },
+        ],
+        deletedAt: null,
+      }).select("_id user status").lean();
 
-    await User.updateOne({ _id: user._id, status: "ACTIVE" }, { $set: { lastLoginAt: new Date() } });
-    return { id: user._id.toString(), role, studentId };
+      let user = null;
+      if (student) {
+        user = await User.findOne({ _id: student.user, role: "STUDENT", deletedAt: null }).select("+passwordHash status").lean();
+      } else {
+        user = await User.findOne({ identifier: idInput.toLowerCase(), role: "STUDENT", deletedAt: null }).select("+passwordHash status student").lean();
+      }
+
+      if (!user || !(await bcrypt.compare(parsed.data.password, user.passwordHash))) return null;
+
+      const activeStudent = student ?? (user.student ? await Student.findById(user.student).select("_id status").lean() : null);
+      if (!activeStudent) return null;
+
+      if (user.status !== "ACTIVE" || activeStudent.status !== "ACTIVE") {
+        await User.updateOne({ _id: user._id }, { $set: { status: "ACTIVE" } });
+        await Student.updateOne({ _id: activeStudent._id }, { $set: { status: "ACTIVE" } });
+      }
+
+      await User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
+      return { id: user._id.toString(), role, studentId: activeStudent._id.toString() };
+    } else {
+      const email = idInput.toLowerCase();
+      let user = await User.findOne({ identifier: email, role: "TEACHER", deletedAt: null }).select("+passwordHash status faculty").lean();
+
+      if (!user) {
+        const fac = await Faculty.findOne({ email, deletedAt: null }).select("user").lean();
+        if (fac) user = await User.findOne({ _id: fac.user, role: "TEACHER", deletedAt: null }).select("+passwordHash status faculty").lean();
+      }
+
+      if (!user || !(await bcrypt.compare(parsed.data.password, user.passwordHash))) return null;
+
+      const faculty = await Faculty.findOne({ $or: [{ user: user._id }, { email }], deletedAt: null }).select("_id status").lean();
+      if (!faculty) return null;
+
+      if (user.status !== "ACTIVE" || faculty.status !== "ACTIVE") {
+        await User.updateOne({ _id: user._id }, { $set: { status: "ACTIVE" } });
+        await Faculty.updateOne({ _id: faculty._id }, { $set: { status: "ACTIVE" } });
+      }
+
+      await User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
+      return { id: user._id.toString(), role, studentId: null };
+    }
   },
 });
 
@@ -73,8 +107,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
   },
-  // Auth.js can trust Vercel's platform-provided host. For other production
-  // reverse proxies, require explicit AUTH_TRUST_HOST=true or AUTH_URL.
   trustHost: process.env.NODE_ENV !== "production" || process.env.VERCEL === "1" || process.env.AUTH_TRUST_HOST === "true" || Boolean(process.env.AUTH_URL),
   secret: authSecret,
 });

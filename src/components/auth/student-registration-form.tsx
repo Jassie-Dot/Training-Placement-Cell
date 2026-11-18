@@ -55,17 +55,17 @@ export function StudentRegistrationForm() {
         <input id="fullName" name="fullName" autoComplete="name" required minLength={2} maxLength={160} />
         <label htmlFor="rollNumber">University roll number</label>
         <input id="rollNumber" name="rollNumber" autoComplete="username" required maxLength={40} />
-        <label htmlFor="email">GNDEC email address</label>
-        <input id="email" name="email" type="email" autoComplete="email" required maxLength={254} pattern=".+@gndec\.ac\.in" title="Use an email ending in @gndec.ac.in." placeholder="name@gndec.ac.in" />
+        <label htmlFor="email">Email address</label>
+        <input id="email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="name@gndec.ac.in or student@gmail.com" />
         <div className="register-grid">
           <div><label htmlFor="department">Department</label><input id="department" name="department" required maxLength={100} /></div>
           <div><label htmlFor="semester">Semester</label><select id="semester" name="semester" required defaultValue=""><option value="" disabled>Select</option>{Array.from({ length: 12 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}</select></div>
         </div>
         <label htmlFor="password">Password</label>
-        <input id="password" name="password" type="password" autoComplete="new-password" required minLength={12} maxLength={72} value={password} onChange={(event) => setPassword(event.target.value)} />
+        <input id="password" name="password" type="password" autoComplete="new-password" required minLength={6} maxLength={72} value={password} onChange={(event) => setPassword(event.target.value)} />
         <label htmlFor="confirmPassword">Confirm password</label>
-        <input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" required minLength={12} maxLength={72} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
-        <p className="register-hint">Use at least 12 characters. Your account remains inactive until you verify your email. Faculty will assign your training after registration.</p>
+        <input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" required minLength={6} maxLength={72} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
+        <p className="register-hint">Use at least 6 characters. You can sign in immediately after registration.</p>
         {error && <p className="register-error" role="alert">{error}</p>}
         <button className="register-submit" type="submit" disabled={loading}>{loading ? <><LoaderCircle className="register-spin" size={17} /> Creating account…</> : <>Register account <span>→</span></>}</button>
       </form>}

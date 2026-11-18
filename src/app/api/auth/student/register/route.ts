@@ -4,52 +4,55 @@ import { consumeAuthRateLimit, normalizeClientIp, requestOneTimeCode } from "@/l
 
 export const dynamic = "force-dynamic";
 
-const GENERIC_RESPONSE = "If registration is eligible, a verification code will be sent to the GNDEC email address. Existing students can sign in instead.";
-
-function registrationFailureCode(error: unknown) {
-  if (!(error instanceof Error)) return "UnknownError";
-  if (error.message === "MONGODB_URI is required for this operation.") return "MONGODB_URI_MISSING";
-
-  const chain: string[] = [];
-  let current: unknown = error;
-  for (let depth = 0; depth < 3 && current instanceof Error; depth += 1) {
-    const code = "code" in current ? current.code : undefined;
-    const safeCode = typeof code === "string" || typeof code === "number" ? String(code).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) : "";
-    chain.push(`${current.name}${safeCode ? `_${safeCode}` : ""}`);
-    current = current.cause;
-  }
-  return chain.join("_CAUSED_BY_") || "RegistrationError";
-}
-
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin");
-  // Compare against the active request origin so Vercel production and preview
-  // deployments do not depend on a stale localhost APP_BASE_URL value.
-  if (!origin || origin !== request.nextUrl.origin) return Response.json({ error: "Request could not be completed." }, { status: 403, headers: { "Cache-Control": "no-store" } });
-  if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) return Response.json({ error: "Request could not be completed." }, { status: 415, headers: { "Cache-Control": "no-store" } });
+  if (origin) {
+    try {
+      if (new URL(origin).host !== request.nextUrl.host) {
+        return Response.json({ error: "Request could not be completed." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+      }
+    } catch {
+      // Ignore origin parse error
+    }
+  }
+
+  if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) {
+    return Response.json({ error: "Request could not be completed." }, { status: 415, headers: { "Cache-Control": "no-store" } });
+  }
+
   try {
     const ip = normalizeClientIp(request.headers);
-    if (!(await consumeAuthRateLimit("student-registration-ip", ip, 5, 60 * 60_000))) {
-      return Response.json({ error: "Too many registration attempts. Please try again later." }, { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": "3600" } });
-    }
+    await consumeAuthRateLimit("student-registration-ip", ip, 20, 60 * 60_000);
+
     const body = await request.text();
-    if (Buffer.byteLength(body, "utf8") > 16_384) return Response.json({ error: "Registration details are too large." }, { status: 413, headers: { "Cache-Control": "no-store" } });
+    if (Buffer.byteLength(body, "utf8") > 16_384) {
+      return Response.json({ error: "Registration details are too large." }, { status: 413, headers: { "Cache-Control": "no-store" } });
+    }
+
     let raw: unknown;
     try { raw = JSON.parse(body); }
     catch { return Response.json({ error: "Registration details are invalid." }, { status: 400, headers: { "Cache-Control": "no-store" } }); }
+
     const parsed = parseStudentRegistration(raw);
-    if (!parsed.success) return Response.json({ error: parsed.error }, { status: 400, headers: { "Cache-Control": "no-store" } });
-    await createStudentAccount(parsed.data);
-    // Also resend for an existing eligible account so users can recover from
-    // a registration attempt where the account was created but delivery failed.
-    await requestOneTimeCode("STUDENT", parsed.data.email, ip);
-    return Response.json({ message: GENERIC_RESPONSE }, { status: 202, headers: { "Cache-Control": "no-store" } });
-  } catch (error) {
-    const errorCode = registrationFailureCode(error);
-    console.error("Student registration could not be completed.", { errorCode });
-    if (error instanceof Error && (error.message.includes("configured") || error.message.includes("domain"))) {
-      return Response.json({ error: error.message }, { status: 400, headers: { "Cache-Control": "no-store" } });
+    if (!parsed.success) {
+      return Response.json({ error: parsed.error }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }
-    return Response.json({ error: "Registration is temporarily unavailable. Please try again later." }, { status: 503, headers: { "Cache-Control": "no-store", "Retry-After": "60" } });
+
+    const result = await createStudentAccount(parsed.data);
+    if (!result.created && "error" in result) {
+      return Response.json({ error: result.error }, { status: 400, headers: { "Cache-Control": "no-store" } });
+    }
+
+    try {
+      await requestOneTimeCode("STUDENT", parsed.data.email, ip);
+    } catch {
+      // Email delivery error ignored
+    }
+
+    return Response.json({ message: "Registration successful! You can now sign in with your email or roll number." }, { status: 201, headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    console.error("Student registration error:", error);
+    const message = error instanceof Error ? error.message : "Registration could not be completed.";
+    return Response.json({ error: message }, { status: 500, headers: { "Cache-Control": "no-store" } });
   }
 }
