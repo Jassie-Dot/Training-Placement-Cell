@@ -72,7 +72,7 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
       setSecondsLeft(result.retryAfterSeconds ?? 60);
       setInfo(
         result.message ??
-          "If the account is eligible, a code will be sent to its registered email."
+          "If the account is eligible, a verification code will be sent to its registered email."
       );
     } catch {
       setError("Verification service unreachable. Please try again.");
@@ -130,35 +130,29 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
   }
 
   return (
-    <main className="glass-auth-root">
-      {/* Background ambient lighting */}
-      <div className="glass-auth-backdrop" aria-hidden="true">
-        <div className="glass-ambient-orb orb-top-left" />
-        <div className="glass-ambient-orb orb-bottom-right" />
-      </div>
-
-      {/* Header */}
-      <header className="glass-auth-header">
-        <Link href="/" className="glass-auth-brand">
-          <span className="brand-icon">
+    <main className="auth-page-root">
+      {/* Brand Header */}
+      <header className="auth-header">
+        <Link href="/" className="auth-brand">
+          <span className="auth-brand-icon">
             <GraduationCap size={22} />
           </span>
-          <div className="brand-titles">
+          <div className="auth-brand-text">
             <strong>GNDEC</strong>
             <small>TRAINING &amp; PLACEMENT CELL</small>
           </div>
         </Link>
       </header>
 
-      {/* Main Glass Card */}
-      <section className="glass-auth-card">
-        <div className="card-badge-row">
+      {/* Main Clean Card */}
+      <section className="auth-card">
+        <div className="auth-card-top">
           <span
-            className={`role-pill ${
+            className={`auth-role-pill ${
               teacher ? "admin-pill" : "student-pill"
             }`}
           >
-            {teacher ? "ADMINISTRATOR PORTAL" : "STUDENT PORTAL"}
+            {teacher ? "ADMINISTRATOR ACCESS" : "STUDENT ACCESS"}
           </span>
         </div>
 
@@ -166,18 +160,18 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
           {codeRequested && mode === "otp"
             ? "Check your email"
             : teacher
-            ? "Admin Sign In"
+            ? "Administrator Sign In"
             : "Student Sign In"}
         </h1>
         <p className="auth-subtitle">
           {teacher
-            ? "Sign in with your registered administrator email and password to manage student records."
-            : "Sign in with your registered email or university roll number to view your training status."}
+            ? "Sign in with your registered administrator email to manage student records and excel uploads."
+            : "Sign in with your University Roll Number or Registered Email to view your training status."}
         </p>
 
         {error && (
-          <div className="glass-auth-alert error-alert" role="alert">
-            <AlertCircle className="alert-icon" size={18} />
+          <div className="auth-alert error-alert" role="alert">
+            <AlertCircle className="alert-icon" size={17} />
             <div className="alert-content">
               <strong>Authentication issue</strong>
               <p>{error}</p>
@@ -186,7 +180,7 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
         )}
 
         {info && (
-          <div className="glass-auth-alert info-alert" role="status">
+          <div className="auth-alert info-alert" role="status">
             <div className="alert-content">
               <p>{info}</p>
             </div>
@@ -194,13 +188,13 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
         )}
 
         {mode === "password" && (
-          <form className="glass-auth-form" onSubmit={passwordSignIn}>
+          <form className="auth-form" onSubmit={passwordSignIn}>
             <div className="form-group">
               <label htmlFor="identifier-password">
-                {teacher ? "Admin Email Address" : "Email or University Roll Number"}
+                {teacher ? "Official Email Address" : "Email or University Roll Number"}
               </label>
-              <div className="input-glass-wrap">
-                <Mail size={17} className="input-icon" />
+              <div className="input-wrap">
+                <Mail size={16} className="input-icon" />
                 <input
                   id="identifier-password"
                   name="identifier"
@@ -221,8 +215,8 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
 
             <div className="form-group">
               <label htmlFor="password">Password</label>
-              <div className="input-glass-wrap">
-                <LockKeyhole size={17} className="input-icon" />
+              <div className="input-wrap">
+                <LockKeyhole size={16} className="input-icon" />
                 <input
                   id="password"
                   name="password"
@@ -240,25 +234,25 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
                   onClick={() => setVisible((v) => !v)}
                   aria-label={visible ? "Hide password" : "Show password"}
                 >
-                  {visible ? <EyeOff size={17} /> : <Eye size={17} />}
+                  {visible ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
             <button
-              className="glass-auth-btn primary-btn submit-btn"
+              className="auth-btn btn-primary"
               type="submit"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <LoaderCircle className="spin-icon" size={18} />
+                  <LoaderCircle className="spin-icon" size={16} />
                   <span>Signing in…</span>
                 </>
               ) : (
                 <>
                   <span>Sign In</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>
@@ -278,11 +272,11 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
         )}
 
         {mode === "otp" && !codeRequested && (
-          <form className="glass-auth-form" onSubmit={requestCode}>
+          <form className="auth-form" onSubmit={requestCode}>
             <div className="form-group">
               <label htmlFor="identifier">Registered Email Address</label>
-              <div className="input-glass-wrap">
-                <Mail size={17} className="input-icon" />
+              <div className="input-wrap">
+                <Mail size={16} className="input-icon" />
                 <input
                   id="identifier"
                   name="identifier"
@@ -298,19 +292,19 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
             </div>
 
             <button
-              className="glass-auth-btn primary-btn submit-btn"
+              className="auth-btn btn-primary"
               type="submit"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <LoaderCircle className="spin-icon" size={18} />
+                  <LoaderCircle className="spin-icon" size={16} />
                   <span>Sending code…</span>
                 </>
               ) : (
                 <>
                   <span>Send One-Time Code</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>
@@ -329,11 +323,10 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
         )}
 
         {mode === "otp" && codeRequested && (
-          <form className="glass-auth-form" onSubmit={verifyCode}>
+          <form className="auth-form" onSubmit={verifyCode}>
             <div className="form-group">
               <label htmlFor="otp">Enter 6-digit Code</label>
-              <div className="input-glass-wrap otp-wrap">
-                <Mail size={17} className="input-icon" />
+              <div className="input-wrap otp-wrap">
                 <input
                   id="otp"
                   name="otp"
@@ -352,19 +345,19 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
             </div>
 
             <button
-              className="glass-auth-btn primary-btn submit-btn"
+              className="auth-btn btn-primary"
               type="submit"
               disabled={loading || code.length !== 6}
             >
               {loading ? (
                 <>
-                  <LoaderCircle className="spin-icon" size={18} />
+                  <LoaderCircle className="spin-icon" size={16} />
                   <span>Verifying…</span>
                 </>
               ) : (
                 <>
                   <span>Verify and Sign In</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>
@@ -405,18 +398,18 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
           </form>
         )}
 
-        <footer className="glass-card-footer">
+        <footer className="auth-footer">
           {teacher ? (
             <>
               <span>New administrator?</span>
-              <Link href="/faculty/register" className="card-link">
+              <Link href="/faculty/register" className="auth-link">
                 Register Admin Account
               </Link>
             </>
           ) : (
             <>
               <span>New student?</span>
-              <Link href="/student/register" className="card-link">
+              <Link href="/student/register" className="auth-link">
                 Create an account
               </Link>
             </>
@@ -424,187 +417,146 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
         </footer>
       </section>
 
-      <div className="glass-auth-nav">
+      <div className="auth-nav">
         <Link href="/" className="back-link">
-          <ArrowLeft size={15} />
-          <span>Back to Portal Directory</span>
+          <ArrowLeft size={14} />
+          <span>Back to Main Portal</span>
         </Link>
       </div>
 
-      <style>{loginStyles}</style>
+      <style>{cleanAuthStyles}</style>
     </main>
   );
 }
 
-const loginStyles = `
-.glass-auth-root {
+const cleanAuthStyles = `
+/* Clean, sleek, professional institutional auth styling (single scrollbar, no flashiness) */
+.auth-page-root {
   min-height: 100vh;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 18px;
-  font-family: inherit;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.glass-auth-backdrop {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
-              #f8fafc;
-}
-
-.glass-ambient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  opacity: 0.6;
-}
-.orb-top-left {
-  top: -40px;
-  left: -40px;
-  width: 340px;
-  height: 340px;
-  background: rgba(59, 130, 246, 0.22);
-}
-.orb-bottom-right {
-  bottom: -40px;
-  right: -40px;
-  width: 380px;
-  height: 380px;
-  background: rgba(147, 51, 234, 0.18);
-}
-
-.glass-auth-header {
-  position: relative;
-  z-index: 2;
+.auth-header {
   margin-bottom: 24px;
 }
-.glass-auth-brand {
+.auth-brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  color: #0f172a;
 }
-.brand-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+.auth-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #0f2b48;
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  display: grid;
+  place-items: center;
 }
-.brand-titles strong {
+.auth-brand-text strong {
   display: block;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.03em;
-  color: #0f172a;
+  letter-spacing: 0.04em;
+  color: #0f2b48;
   line-height: 1.1;
 }
-.brand-titles small {
+.auth-brand-text small {
   display: block;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
   color: #64748b;
-  letter-spacing: 0.12em;
-  margin-top: 3px;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
 }
 
-.glass-auth-card {
-  position: relative;
-  z-index: 2;
+.auth-card {
   width: min(100%, 460px);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
-  padding: 36px 34px 32px;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 34px 32px 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
-.card-badge-row {
+.auth-card-top {
   margin-bottom: 12px;
 }
-.role-pill {
+.auth-role-pill {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 5px 12px;
-  border-radius: 9999px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 4px;
   display: inline-block;
 }
 .student-pill {
-  background: rgba(37, 99, 235, 0.1);
-  color: #1d4ed8;
-  border: 1px solid rgba(37, 99, 235, 0.2);
+  background: #eff6ff;
+  color: #1e40af;
 }
 .admin-pill {
-  background: rgba(147, 51, 234, 0.1);
-  color: #7e22ce;
-  border: 1px solid rgba(147, 51, 234, 0.2);
+  background: #f1f5f9;
+  color: #0f2b48;
 }
 
 .auth-title {
-  margin: 0 0 8px;
-  font-size: 26px;
+  margin: 0 0 6px;
+  font-size: 23px;
   font-weight: 800;
-  color: #0f172a;
+  color: #0f2b48;
   letter-spacing: -0.02em;
 }
 .auth-subtitle {
-  margin: 0 0 24px;
-  font-size: 13.5px;
-  color: #64748b;
-  line-height: 1.55;
-}
-
-.glass-auth-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 13px 16px;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  margin: 0 0 22px;
   font-size: 13px;
+  color: #64748b;
   line-height: 1.5;
 }
+
+.auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
 .error-alert {
-  background: rgba(254, 242, 242, 0.9);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   color: #991b1b;
 }
 .error-alert .alert-icon {
   color: #dc2626;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 .info-alert {
-  background: rgba(239, 246, 255, 0.9);
-  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
   color: #1e40af;
 }
 
-.glass-auth-form {
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 15px;
 }
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 .form-group label {
   font-size: 12px;
@@ -612,34 +564,33 @@ const loginStyles = `
   color: #334155;
 }
 
-.input-glass-wrap {
+.input-wrap {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(203, 213, 225, 0.8);
-  border-radius: 12px;
-  padding: 0 14px;
-  height: 45px;
-  transition: all 0.2s ease;
-}
-.input-glass-wrap:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 42px;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.input-glass-wrap input {
+.input-wrap:focus-within {
+  border-color: #0f2b48;
+  box-shadow: 0 0 0 3px rgba(15, 43, 72, 0.1);
+}
+.input-wrap input {
   width: 100%;
   height: 100%;
   border: 0;
   outline: 0;
   background: transparent;
   color: #0f172a;
-  font-size: 13.5px;
+  font-size: 13px;
   font-family: inherit;
 }
-.input-glass-wrap input::placeholder {
-  color: #94a3b8;
+.input-wrap input::placeholder {
+  color: #9ca3af;
 }
 .otp-wrap input {
   text-align: center;
@@ -648,47 +599,44 @@ const loginStyles = `
   font-weight: 700;
 }
 .input-icon {
-  color: #94a3b8;
+  color: #64748b;
   flex-shrink: 0;
 }
 .password-toggle {
   border: 0;
   background: transparent;
-  color: #94a3b8;
+  color: #64748b;
   cursor: pointer;
   display: grid;
   place-items: center;
   padding: 4px;
 }
 .password-toggle:hover {
-  color: #334155;
+  color: #0f172a;
 }
 
-.glass-auth-btn {
+.auth-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  height: 48px;
-  border-radius: 12px;
+  gap: 8px;
+  height: 44px;
+  border-radius: 8px;
   border: 0;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 6px;
+  transition: background 0.15s;
+  margin-top: 4px;
 }
-.primary-btn {
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+.btn-primary {
+  background: #0f2b48;
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
-.primary-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1e40af, #1d4ed8);
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-  transform: translateY(-1px);
+.btn-primary:hover:not(:disabled) {
+  background: #1e3a5f;
 }
-.primary-btn:disabled {
+.btn-primary:disabled {
   opacity: 0.65;
   cursor: wait;
 }
@@ -702,12 +650,12 @@ const loginStyles = `
 .toggle-mode-btn {
   background: transparent;
   border: 0;
-  color: #2563eb;
+  color: #0f2b48;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .toggle-mode-btn:hover {
   text-decoration: underline;
@@ -737,55 +685,51 @@ const loginStyles = `
   cursor: not-allowed;
 }
 
-.glass-card-footer {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
+.auth-footer {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12.5px;
   color: #64748b;
 }
-.card-link {
-  color: #2563eb;
+.auth-link {
+  color: #0f2b48;
   font-weight: 700;
   text-decoration: none;
 }
-.card-link:hover {
+.auth-link:hover {
   text-decoration: underline;
 }
 
-.glass-auth-nav {
-  position: relative;
-  z-index: 2;
-  margin-top: 24px;
+.auth-nav {
+  margin-top: 22px;
 }
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #64748b;
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  transition: all 0.2s;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s;
 }
 .back-link:hover {
   color: #0f172a;
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-1px);
+  border-color: #cbd5e1;
 }
 
 @media (max-width: 500px) {
-  .glass-auth-card {
-    padding: 26px 20px;
-    border-radius: 18px;
+  .auth-card {
+    padding: 24px 20px;
   }
 }
 `;

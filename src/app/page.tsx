@@ -1,396 +1,450 @@
 import Link from "next/link";
-import { ArrowRight, GraduationCap, ShieldCheck, Sparkles, UserRoundPlus, Users } from "lucide-react";
+import { ArrowRight, FileSpreadsheet, GraduationCap, Lock, ShieldCheck, UserCheck, UserPlus, Users } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <main className="portal-landing">
-      {/* Background ambient lighting effects */}
-      <div className="ambient-orb orb-1" />
-      <div className="ambient-orb orb-2" />
-      <div className="ambient-orb orb-3" />
-
-      {/* Header */}
-      <header className="portal-header">
-        <div className="portal-brand">
-          <span className="brand-logo">
-            <GraduationCap size={24} />
-          </span>
-          <div className="brand-text">
-            <strong>GNDEC</strong>
-            <small>TRAINING &amp; PLACEMENT CELL</small>
+    <main className="institutional-portal">
+      {/* Top University Brand Bar */}
+      <header className="inst-header">
+        <div className="inst-header-inner">
+          <div className="inst-brand">
+            <span className="inst-brand-logo">
+              <GraduationCap size={22} />
+            </span>
+            <div className="inst-brand-titles">
+              <strong>GURU NANAK DEV ENGINEERING COLLEGE</strong>
+              <small>TRAINING &amp; PLACEMENT CELL · LUDHIANA, PUNJAB</small>
+            </div>
           </div>
-        </div>
-        <div className="portal-status-pill">
-          <span className="live-dot" />
-          <span>System Online</span>
+          <div className="inst-badge">
+            <span className="pulse-indicator" />
+            <span>Portal Active · Session 2026</span>
+          </div>
         </div>
       </header>
 
-      {/* Center Hero & Portal Cards */}
-      <section className="portal-center-wrap">
-        <div className="portal-hero-text">
-          <span className="glass-kicker">
-            <Sparkles size={14} /> OFFICIAL PORTAL
-          </span>
-          <h1>Training &amp; Placement Portal</h1>
+      {/* Main Center Section */}
+      <section className="inst-hero-section">
+        <div className="inst-hero-text">
+          <span className="inst-category-pill">OFFICIAL ACADEMIC PORTAL</span>
+          <h1>Training &amp; Placement Management System</h1>
           <p>
-            Secure, centralized platform for student industrial training, project evaluations, verified certificates, and administrator records management.
+            Centralized platform for GNDEC students and training administration. Access verified industrial training records, project evaluations, attendance, and official completion certificates.
           </p>
         </div>
 
-        <div className="portal-cards-grid">
-          {/* STUDENT PORTAL CARD */}
-          <article className="portal-glass-card student-card">
-            <div className="card-top">
-              <span className="card-icon-wrap icon-student">
-                <GraduationCap size={28} />
-              </span>
-              <span className="card-role-badge">STUDENT</span>
+        {/* Portal Options Grid */}
+        <div className="inst-grid">
+          {/* STUDENT CARD */}
+          <article className="inst-card">
+            <div className="inst-card-header">
+              <div className="inst-icon-box student-icon">
+                <GraduationCap size={24} />
+              </div>
+              <span className="inst-role-tag student-tag">STUDENT PORTAL</span>
             </div>
-            <div className="card-content">
-              <h2>Student Portal</h2>
+
+            <div className="inst-card-body">
+              <h2>Student Access</h2>
               <p>
-                Sign in with your University Roll Number or Registered Email. View your personalized training assignments, evaluation marks, attendance, and certificates.
+                Sign in with your University Roll Number or Registered Email. View your personalized industrial training status, evaluation marks, company details, attendance, and download certificates.
               </p>
             </div>
-            <div className="card-actions">
-              <Link className="portal-btn btn-primary" href="/student/login">
-                <span>Student Sign In</span>
-                <ArrowRight size={18} />
+
+            <div className="inst-card-actions">
+              <Link className="inst-btn btn-navy" href="/student/login">
+                <span>Sign In as Student</span>
+                <ArrowRight size={16} />
               </Link>
-              <Link className="portal-btn btn-glass" href="/student/register">
-                <UserRoundPlus size={16} />
+              <Link className="inst-btn btn-outline" href="/student/register">
+                <UserPlus size={15} />
                 <span>Create Student Account</span>
               </Link>
             </div>
           </article>
 
-          {/* ADMIN PORTAL CARD (Replaces Teacher) */}
-          <article className="portal-glass-card admin-card">
-            <div className="card-top">
-              <span className="card-icon-wrap icon-admin">
-                <ShieldCheck size={28} />
-              </span>
-              <span className="card-role-badge badge-admin">ADMINISTRATOR</span>
+          {/* ADMINISTRATOR CARD */}
+          <article className="inst-card">
+            <div className="inst-card-header">
+              <div className="inst-icon-box admin-icon">
+                <ShieldCheck size={24} />
+              </div>
+              <span className="inst-role-tag admin-tag">ADMINISTRATOR PORTAL</span>
             </div>
-            <div className="card-content">
-              <h2>Admin Portal</h2>
+
+            <div className="inst-card-body">
+              <h2>Admin Workspace</h2>
               <p>
-                Dedicated control panel for training placement administrators. Upload student data spreadsheets, manage certificates, and mirror student dashboard views.
+                Dedicated control panel for training placement administrators. Upload standardized student Excel/CSV spreadsheets, record evaluations, issue certificates, and mirror student dashboard views.
               </p>
             </div>
-            <div className="card-actions">
-              <Link className="portal-btn btn-admin" href="/faculty/login">
+
+            <div className="inst-card-actions">
+              <Link className="inst-btn btn-slate" href="/faculty/login">
                 <span>Admin Sign In</span>
-                <ArrowRight size={18} />
+                <ArrowRight size={16} />
               </Link>
-              <Link className="portal-btn btn-glass" href="/faculty/register">
-                <Users size={16} />
+              <Link className="inst-btn btn-outline" href="/faculty/register">
+                <Users size={15} />
                 <span>Admin Registration</span>
               </Link>
             </div>
           </article>
         </div>
+
+        {/* Quick Help / Highlights */}
+        <div className="inst-highlights">
+          <div className="highlight-item">
+            <FileSpreadsheet size={18} className="highlight-icon" />
+            <div>
+              <strong>Excel Data Synchronization</strong>
+              <span>Bulk upload student records and certificates via standardized templates.</span>
+            </div>
+          </div>
+          <div className="highlight-item">
+            <UserCheck size={18} className="highlight-icon" />
+            <div>
+              <strong>Personalized Student View</strong>
+              <span>Students see only their individual training progress and evaluation marks.</span>
+            </div>
+          </div>
+          <div className="highlight-item">
+            <Lock size={18} className="highlight-icon" />
+            <div>
+              <strong>Authorized &amp; Verified</strong>
+              <span>Secure authentication for university students and designated placement admins.</span>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Footer */}
-      <footer className="portal-footer">
-        <p>© Guru Nanak Dev Engineering College · Training &amp; Placement Department</p>
+      {/* University Footer */}
+      <footer className="inst-footer">
+        <div className="inst-footer-inner">
+          <p>© Guru Nanak Dev Engineering College (GNDEC), Ludhiana · Training &amp; Placement Department</p>
+          <p className="footer-sub">Autonomous institution under UGC Act · Affiliated to IKGPTU Jalandhar</p>
+        </div>
       </footer>
 
-      <style>{styles}</style>
+      <style>{institutionalStyles}</style>
     </main>
   );
 }
 
-const styles = `
-.portal-landing {
+const institutionalStyles = `
+/* Clean, sleek, institutional university theme (no flashiness, single scrollbar) */
+.institutional-portal {
   min-height: 100vh;
-  position: relative;
-  background: radial-gradient(circle at 10% 20%, #0f1e36 0%, #0a1324 100%);
-  color: #f8fafc;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  background-color: #f8fafc;
+  color: #0f172a;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.ambient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.45;
+/* Header */
+.inst-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 16px 24px;
 }
-.orb-1 {
-  width: 450px;
-  height: 450px;
-  background: #3b82f6;
-  top: -100px;
-  left: -100px;
-}
-.orb-2 {
-  width: 500px;
-  height: 500px;
-  background: #8b5cf6;
-  bottom: -150px;
-  right: -100px;
-}
-.orb-3 {
-  width: 350px;
-  height: 350px;
-  background: #06b6d4;
-  top: 40%;
-  left: 60%;
-}
-
-.portal-header {
-  position: relative;
-  z-index: 10;
+.inst-header-inner {
+  max-width: 1140px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px max(24px, calc((100vw - 1200px)/2));
+  gap: 16px;
+  flex-wrap: wrap;
 }
-
-.portal-brand {
+.inst-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
-.brand-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.inst-brand-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #0f2b48;
+  color: #ffffff;
   display: grid;
   place-items: center;
-  color: #60a5fa;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
-.brand-text strong {
+.inst-brand-titles strong {
   display: block;
-  font-size: 16px;
-  letter-spacing: 0.05em;
-  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #0f2b48;
+  line-height: 1.2;
 }
-.brand-text small {
+.inst-brand-titles small {
   display: block;
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-top: 2px;
 }
 
-.portal-status-pill {
-  display: flex;
+.inst-badge {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
-  border-radius: 30px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 11px;
-  color: #cbd5e1;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #334155;
 }
-.live-dot {
+.pulse-indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 10px #10b981;
+  background: #16a34a;
 }
 
-.portal-center-wrap {
-  position: relative;
-  z-index: 10;
-  width: min(1080px, calc(100% - 36px));
-  margin: auto;
-  padding: 20px 0 60px;
-  text-align: center;
-}
-
-.glass-kicker {
-  display: inline-flex;
+/* Hero Section */
+.inst-hero-section {
+  flex: 1;
+  max-width: 1040px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 48px 24px 60px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(96, 165, 250, 0.15);
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  color: #93c5fd;
+}
+
+.inst-hero-text {
+  text-align: center;
+  max-width: 760px;
+  margin-bottom: 40px;
+}
+.inst-category-pill {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #334155;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  margin-bottom: 16px;
-}
-
-.portal-hero-text h1 {
-  font-size: clamp(32px, 5vw, 48px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: 0 0 16px;
-  background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.portal-hero-text p {
-  max-width: 680px;
-  margin: 0 auto 46px;
-  font-size: clamp(14px, 2vw, 16px);
-  color: #94a3b8;
-  line-height: 1.65;
-}
-
-.portal-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-  text-align: left;
-}
-
-.portal-glass-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
   border-radius: 20px;
+  margin-bottom: 14px;
+}
+.inst-hero-text h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f2b48;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+  line-height: 1.25;
+}
+.inst-hero-text p {
+  font-size: 15px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Cards Grid */
+.inst-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.inst-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.inst-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
-.portal-glass-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(96, 165, 250, 0.4);
-  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.5), 0 0 30px rgba(59, 130, 246, 0.15);
-}
-
-.card-top {
+.inst-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
-
-.card-icon-wrap {
-  width: 58px;
-  height: 58px;
-  border-radius: 16px;
+.inst-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
 }
-.icon-student {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2));
-  border: 1px solid rgba(37, 99, 235, 0.4);
-  color: #60a5fa;
+.student-icon {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
 }
-.icon-admin {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #c084fc;
+.admin-icon {
+  background: #f8fafc;
+  color: #0f2b48;
+  border: 1px solid #e2e8f0;
 }
 
-.card-role-badge {
-  padding: 5px 12px;
-  border-radius: 20px;
+.inst-role-tag {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  background: rgba(37, 99, 235, 0.15);
-  color: #93c5fd;
-  border: 1px solid rgba(37, 99, 235, 0.3);
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
-.badge-admin {
-  background: rgba(139, 92, 246, 0.15);
-  color: #d8b4fe;
-  border-color: rgba(139, 92, 246, 0.3);
+.student-tag {
+  background: #f1f5f9;
+  color: #1e3a8a;
+}
+.admin-tag {
+  background: #f1f5f9;
+  color: #334155;
 }
 
-.card-content h2 {
-  font-size: 24px;
-  font-weight: 700;
+.inst-card-body h2 {
+  font-size: 21px;
+  font-weight: 750;
+  color: #0f2b48;
   margin: 0 0 10px;
-  color: #ffffff;
+}
+.inst-card-body p {
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0 0 24px;
 }
 
-.card-content p {
-  color: #94a3b8;
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 0 0 28px;
-  min-height: 60px;
-}
-
-.card-actions {
-  display: grid;
-  gap: 12px;
-  margin-top: auto;
-}
-
-.portal-btn {
+.inst-card-actions {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inst-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  height: 48px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  cursor: pointer;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
   text-decoration: none;
+  transition: all 0.15s ease;
+  cursor: pointer;
 }
-
-.btn-primary {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+.btn-navy {
+  background: #0f2b48;
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 }
-.btn-primary:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.5);
+.btn-navy:hover {
+  background: #1e3a5f;
 }
-
-.btn-admin {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+.btn-slate {
+  background: #1e293b;
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
 }
-.btn-admin:hover {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.5);
+.btn-slate:hover {
+  background: #334155;
 }
-
-.btn-glass {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #e2e8f0;
+.btn-outline {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #d1d5db;
 }
-.btn-glass:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
+.btn-outline:hover {
+  background: #f8fafc;
+  border-color: #9ca3af;
 }
 
-.portal-footer {
-  position: relative;
-  z-index: 10;
-  margin-top: auto;
-  padding: 20px;
-  text-align: center;
-  color: #64748b;
+/* Highlights */
+.inst-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  width: 100%;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+.highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.highlight-icon {
+  color: #0f2b48;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.highlight-item strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f2b48;
+  margin-bottom: 2px;
+}
+.highlight-item span {
+  display: block;
   font-size: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: #64748b;
+  line-height: 1.45;
 }
 
-@media (max-width: 640px) {
-  .portal-cards-grid {
+/* Footer */
+.inst-footer {
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  padding: 24px 20px;
+  text-align: center;
+  margin-top: auto;
+}
+.inst-footer-inner p {
+  margin: 0;
+  font-size: 12.5px;
+  color: #475569;
+  font-weight: 500;
+}
+.inst-footer-inner .footer-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+/* Mobile Responsiveness & Touch Fluidity */
+@media (max-width: 820px) {
+  .inst-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .inst-highlights {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .inst-hero-section {
+    padding: 32px 16px 40px;
+  }
+  .inst-hero-text h1 {
+    font-size: 25px;
+  }
+  .inst-card {
+    padding: 24px 20px;
   }
 }
 `;

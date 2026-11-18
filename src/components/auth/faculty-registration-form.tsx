@@ -61,30 +61,24 @@ export function FacultyRegistrationForm() {
   const isMongoError = error.toLowerCase().includes("mongodb");
 
   return (
-    <main className="glass-auth-root">
-      {/* Background ambient lighting */}
-      <div className="glass-auth-backdrop" aria-hidden="true">
-        <div className="glass-ambient-orb orb-top-left" />
-        <div className="glass-ambient-orb orb-bottom-right" />
-      </div>
-
+    <main className="auth-page-root">
       {/* Brand Header */}
-      <header className="glass-auth-header">
-        <Link href="/" className="glass-auth-brand">
-          <span className="brand-icon">
+      <header className="auth-header">
+        <Link href="/" className="auth-brand">
+          <span className="auth-brand-icon">
             <GraduationCap size={22} />
           </span>
-          <div className="brand-titles">
+          <div className="auth-brand-text">
             <strong>GNDEC</strong>
             <small>TRAINING &amp; PLACEMENT CELL</small>
           </div>
         </Link>
       </header>
 
-      {/* Main Glass Card */}
-      <section className="glass-auth-card">
-        <div className="card-badge-row">
-          <span className="role-pill admin-pill">ADMINISTRATOR REGISTRATION</span>
+      {/* Main Clean Card */}
+      <section className="auth-card">
+        <div className="auth-card-top">
+          <span className="auth-role-pill admin-pill">ADMINISTRATOR REGISTRATION</span>
         </div>
 
         <h1 className="auth-title">Register Admin Account</h1>
@@ -93,8 +87,8 @@ export function FacultyRegistrationForm() {
         </p>
 
         {error && (
-          <div className="glass-auth-alert error-alert" role="alert">
-            <AlertCircle className="alert-icon" size={20} />
+          <div className="auth-alert error-alert" role="alert">
+            <AlertCircle className="alert-icon" size={17} />
             <div className="alert-content">
               <strong>Registration issue</strong>
               <p>{error}</p>
@@ -108,23 +102,23 @@ export function FacultyRegistrationForm() {
         )}
 
         {success ? (
-          <div className="glass-auth-alert success-alert" role="status">
-            <CheckCircle2 className="alert-icon" size={22} />
+          <div className="auth-alert success-alert" role="status">
+            <CheckCircle2 className="alert-icon" size={20} />
             <div className="alert-content">
               <strong>Administrator Registered!</strong>
               <p>{success}</p>
-              <Link className="glass-auth-btn primary-btn mt-3" href="/faculty/login">
+              <Link className="auth-btn btn-primary mt-3" href="/faculty/login">
                 <span>Proceed to Admin Sign In</span>
-                <ArrowRight size={17} />
+                <ArrowRight size={16} />
               </Link>
             </div>
           </div>
         ) : (
-          <form className="glass-auth-form" onSubmit={submit}>
+          <form className="auth-form" onSubmit={submit}>
             <div className="form-group">
               <label htmlFor="fullName">Full Name</label>
-              <div className="input-glass-wrap">
-                <User size={17} className="input-icon" />
+              <div className="input-wrap">
+                <User size={16} className="input-icon" />
                 <input
                   id="fullName"
                   name="fullName"
@@ -138,9 +132,9 @@ export function FacultyRegistrationForm() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Official / Admin Email</label>
-              <div className="input-glass-wrap">
-                <Mail size={17} className="input-icon" />
+              <label htmlFor="email">Official Email Address</label>
+              <div className="input-wrap">
+                <Mail size={16} className="input-icon" />
                 <input
                   id="email"
                   name="email"
@@ -156,8 +150,8 @@ export function FacultyRegistrationForm() {
             <div className="form-row">
               <div className="form-group flex-1">
                 <label htmlFor="password">Password</label>
-                <div className="input-glass-wrap">
-                  <Lock size={17} className="input-icon" />
+                <div className="input-wrap">
+                  <Lock size={16} className="input-icon" />
                   <input
                     id="password"
                     name="password"
@@ -175,8 +169,8 @@ export function FacultyRegistrationForm() {
 
               <div className="form-group flex-1">
                 <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="input-glass-wrap">
-                  <Lock size={17} className="input-icon" />
+                <div className="input-wrap">
+                  <Lock size={16} className="input-icon" />
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -194,239 +188,187 @@ export function FacultyRegistrationForm() {
             </div>
 
             <p className="form-note">
-              Use at least 6 characters. Your admin credentials provide direct administrative access to import spreadsheets and view student dashboards.
+              Use at least 6 characters. Your credentials grant administrative rights to upload excel spreadsheets and manage student records.
             </p>
 
-            <button className="glass-auth-btn primary-btn submit-btn" type="submit" disabled={loading}>
+            <button className="auth-btn btn-primary" type="submit" disabled={loading}>
               {loading ? (
                 <>
-                  <LoaderCircle className="spin-icon" size={18} />
+                  <LoaderCircle className="spin-icon" size={16} />
                   <span>Creating admin account…</span>
                 </>
               ) : (
                 <>
                   <span>Create Administrator Account</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>
           </form>
         )}
 
-        <footer className="glass-card-footer">
+        <footer className="auth-footer">
           <span>Already have an admin account?</span>
-          <Link href="/faculty/login" className="card-link">
+          <Link href="/faculty/login" className="auth-link">
             Sign In here
           </Link>
         </footer>
       </section>
 
-      <div className="glass-auth-nav">
+      <div className="auth-nav">
         <Link href="/" className="back-link">
-          <ArrowLeft size={15} />
-          <span>Back to Portal Directory</span>
+          <ArrowLeft size={14} />
+          <span>Back to Main Portal</span>
         </Link>
       </div>
 
-      <style>{adminRegisterStyles}</style>
+      <style>{cleanAdminRegisterStyles}</style>
     </main>
   );
 }
 
-const adminRegisterStyles = `
-.glass-auth-root {
+const cleanAdminRegisterStyles = `
+/* Clean institutional administrator registration */
+.auth-page-root {
   min-height: 100vh;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 18px;
-  font-family: inherit;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.glass-auth-backdrop {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(circle at 15% 15%, rgba(147, 51, 234, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
-              #f8fafc;
-}
-
-.glass-ambient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  opacity: 0.6;
-}
-.orb-top-left {
-  top: -40px;
-  left: -40px;
-  width: 340px;
-  height: 340px;
-  background: rgba(147, 51, 234, 0.2);
-}
-.orb-bottom-right {
-  bottom: -40px;
-  right: -40px;
-  width: 380px;
-  height: 380px;
-  background: rgba(59, 130, 246, 0.2);
-}
-
-.glass-auth-header {
-  position: relative;
-  z-index: 2;
+.auth-header {
   margin-bottom: 24px;
 }
-.glass-auth-brand {
+.auth-brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  color: #0f172a;
 }
-.brand-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #7e22ce, #9333ea);
+.auth-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #0f2b48;
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 14px rgba(126, 34, 206, 0.3);
+  display: grid;
+  place-items: center;
 }
-.brand-titles strong {
+.auth-brand-text strong {
   display: block;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.03em;
-  color: #0f172a;
+  letter-spacing: 0.04em;
+  color: #0f2b48;
   line-height: 1.1;
 }
-.brand-titles small {
+.auth-brand-text small {
   display: block;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
   color: #64748b;
-  letter-spacing: 0.12em;
-  margin-top: 3px;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
 }
 
-.glass-auth-card {
-  position: relative;
-  z-index: 2;
-  width: min(100%, 520px);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
-  padding: 36px 36px 32px;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+.auth-card {
+  width: min(100%, 500px);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 34px 32px 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
-.card-badge-row {
+.auth-card-top {
   margin-bottom: 12px;
 }
-.role-pill {
+.auth-role-pill {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 5px 12px;
-  border-radius: 9999px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 4px;
   display: inline-block;
 }
 .admin-pill {
-  background: rgba(147, 51, 234, 0.1);
-  color: #7e22ce;
-  border: 1px solid rgba(147, 51, 234, 0.2);
+  background: #f1f5f9;
+  color: #0f2b48;
 }
 
 .auth-title {
-  margin: 0 0 8px;
-  font-size: 26px;
+  margin: 0 0 6px;
+  font-size: 23px;
   font-weight: 800;
-  color: #0f172a;
+  color: #0f2b48;
   letter-spacing: -0.02em;
 }
 .auth-subtitle {
-  margin: 0 0 24px;
-  font-size: 13.5px;
-  color: #64748b;
-  line-height: 1.55;
-}
-
-.glass-auth-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 18px;
-  border-radius: 14px;
-  margin-bottom: 22px;
+  margin: 0 0 22px;
   font-size: 13px;
+  color: #64748b;
   line-height: 1.5;
 }
+
+.auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
 .error-alert {
-  background: rgba(254, 242, 242, 0.9);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   color: #991b1b;
 }
 .error-alert .alert-icon {
   color: #dc2626;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 .success-alert {
-  background: rgba(240, 253, 244, 0.95);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
   color: #166534;
 }
 .success-alert .alert-icon {
   color: #16a34a;
   flex-shrink: 0;
-  margin-top: 2px;
-}
-.alert-content strong {
-  display: block;
-  font-size: 13.5px;
-  font-weight: 700;
-  margin-bottom: 2px;
+  margin-top: 1px;
 }
 .mongo-help-tip {
   margin-top: 8px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
+  padding: 8px 10px;
+  background: #ffffff;
+  border-radius: 6px;
   border-left: 3px solid #dc2626;
-  font-size: 12px;
+  font-size: 11.5px;
   color: #7f1d1d;
 }
-.mongo-help-tip code {
-  background: rgba(0, 0, 0, 0.06);
-  padding: 2px 5px;
-  border-radius: 4px;
-  font-weight: 700;
-}
 
-.glass-auth-form {
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 15px;
 }
 .form-row {
   display: flex;
-  gap: 14px;
+  gap: 12px;
 }
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 .form-group label {
   font-size: 12px;
@@ -435,72 +377,68 @@ const adminRegisterStyles = `
 }
 .flex-1 { flex: 1; }
 
-.input-glass-wrap {
+.input-wrap {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(203, 213, 225, 0.8);
-  border-radius: 12px;
-  padding: 0 14px;
-  height: 44px;
-  transition: all 0.2s ease;
-}
-.input-glass-wrap:focus-within {
-  border-color: #9333ea;
-  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.15);
   background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 42px;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.input-glass-wrap input {
+.input-wrap:focus-within {
+  border-color: #0f2b48;
+  box-shadow: 0 0 0 3px rgba(15, 43, 72, 0.1);
+}
+.input-wrap input {
   width: 100%;
   height: 100%;
   border: 0;
   outline: 0;
   background: transparent;
   color: #0f172a;
-  font-size: 13.5px;
+  font-size: 13px;
   font-family: inherit;
 }
-.input-glass-wrap input::placeholder {
-  color: #94a3b8;
+.input-wrap input::placeholder {
+  color: #9ca3af;
 }
 .input-icon {
-  color: #94a3b8;
+  color: #64748b;
   flex-shrink: 0;
 }
 
 .form-note {
-  margin: 2px 0 6px;
+  margin: 2px 0 4px;
   font-size: 12px;
   color: #64748b;
   line-height: 1.45;
 }
 
-.glass-auth-btn {
+.auth-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  height: 48px;
-  border-radius: 12px;
+  gap: 8px;
+  height: 44px;
+  border-radius: 8px;
   border: 0;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
+  transition: background 0.15s;
+  margin-top: 4px;
 }
-.primary-btn {
-  background: linear-gradient(135deg, #7e22ce, #9333ea);
+.btn-primary {
+  background: #0f2b48;
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(126, 34, 206, 0.25);
 }
-.primary-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #6b21a8, #7e22ce);
-  box-shadow: 0 10px 24px rgba(126, 34, 206, 0.35);
-  transform: translateY(-1px);
+.btn-primary:hover:not(:disabled) {
+  background: #1e3a5f;
 }
-.primary-btn:disabled {
+.btn-primary:disabled {
   opacity: 0.65;
   cursor: wait;
 }
@@ -511,55 +449,51 @@ const adminRegisterStyles = `
   to { transform: rotate(360deg); }
 }
 
-.glass-card-footer {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
+.auth-footer {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12.5px;
   color: #64748b;
 }
-.card-link {
-  color: #7e22ce;
+.auth-link {
+  color: #0f2b48;
   font-weight: 700;
   text-decoration: none;
 }
-.card-link:hover {
+.auth-link:hover {
   text-decoration: underline;
 }
 
-.glass-auth-nav {
-  position: relative;
-  z-index: 2;
-  margin-top: 24px;
+.auth-nav {
+  margin-top: 22px;
 }
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #64748b;
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  transition: all 0.2s;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s;
 }
 .back-link:hover {
   color: #0f172a;
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-1px);
+  border-color: #cbd5e1;
 }
 
 @media (max-width: 600px) {
-  .glass-auth-card {
-    padding: 26px 20px;
-    border-radius: 18px;
+  .auth-card {
+    padding: 24px 18px;
   }
   .form-row {
     flex-direction: column;

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, GraduationCap, LoaderCircle, Lock, Mail, ShieldAlert, User } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, GraduationCap, LoaderCircle, Lock, Mail, User } from "lucide-react";
 
 export function StudentRegistrationForm() {
   const [loading, setLoading] = useState(false);
@@ -50,46 +50,40 @@ export function StudentRegistrationForm() {
   const isMongoError = error.toLowerCase().includes("mongodb");
 
   return (
-    <main className="glass-auth-root">
-      {/* Ambient background glows */}
-      <div className="glass-auth-backdrop" aria-hidden="true">
-        <div className="glass-ambient-orb orb-top-left" />
-        <div className="glass-ambient-orb orb-bottom-right" />
-      </div>
-
+    <main className="auth-page-root">
       {/* Brand Header */}
-      <header className="glass-auth-header">
-        <Link href="/" className="glass-auth-brand">
-          <span className="brand-icon">
+      <header className="auth-header">
+        <Link href="/" className="auth-brand">
+          <span className="auth-brand-icon">
             <GraduationCap size={22} />
           </span>
-          <div className="brand-titles">
+          <div className="auth-brand-text">
             <strong>GNDEC</strong>
             <small>TRAINING &amp; PLACEMENT CELL</small>
           </div>
         </Link>
       </header>
 
-      {/* Main Glass Card */}
-      <section className="glass-auth-card">
-        <div className="card-badge-row">
-          <span className="role-pill student-pill">STUDENT REGISTRATION</span>
+      {/* Main Card */}
+      <section className="auth-card register-wide-card">
+        <div className="auth-card-top">
+          <span className="auth-role-pill student-pill">STUDENT REGISTRATION</span>
         </div>
 
-        <h1 className="auth-title">Create your account</h1>
+        <h1 className="auth-title">Create Student Account</h1>
         <p className="auth-subtitle">
-          Enter your university credentials to set up instant access to your industrial training and placement dashboard.
+          Enter your university credentials to set up immediate access to your industrial training portal.
         </p>
 
         {error && (
-          <div className="glass-auth-alert error-alert" role="alert">
-            <AlertCircle className="alert-icon" size={20} />
+          <div className="auth-alert error-alert" role="alert">
+            <AlertCircle className="alert-icon" size={17} />
             <div className="alert-content">
               <strong>Registration issue</strong>
               <p>{error}</p>
               {isMongoError && (
                 <div className="mongo-help-tip">
-                  <span>💡 <strong>Quick Fix:</strong> In MongoDB Atlas → <em>Network Access</em>, make sure <code>0.0.0.0/0</code> (Allow Access from Anywhere) is whitelisted so Vercel serverless instances can reach the database.</span>
+                  <span>💡 <strong>Quick Fix:</strong> In MongoDB Atlas → <em>Network Access</em>, whitelist <code>0.0.0.0/0</code> (Allow Access from Anywhere) so Vercel can connect.</span>
                 </div>
               )}
             </div>
@@ -97,23 +91,23 @@ export function StudentRegistrationForm() {
         )}
 
         {success ? (
-          <div className="glass-auth-alert success-alert" role="status">
-            <CheckCircle2 className="alert-icon" size={22} />
+          <div className="auth-alert success-alert" role="status">
+            <CheckCircle2 className="alert-icon" size={20} />
             <div className="alert-content">
               <strong>Account Created Successfully!</strong>
               <p>{success}</p>
-              <Link className="glass-auth-btn primary-btn mt-3" href="/student/login">
+              <Link className="auth-btn btn-primary mt-3" href="/student/login">
                 <span>Proceed to Student Sign In</span>
-                <ArrowRight size={17} />
+                <ArrowRight size={16} />
               </Link>
             </div>
           </div>
         ) : (
-          <form className="glass-auth-form" onSubmit={submit}>
+          <form className="auth-form" onSubmit={submit}>
             <div className="form-group">
               <label htmlFor="fullName">Full Name</label>
-              <div className="input-glass-wrap">
-                <User size={17} className="input-icon" />
+              <div className="input-wrap">
+                <User size={16} className="input-icon" />
                 <input
                   id="fullName"
                   name="fullName"
@@ -129,7 +123,7 @@ export function StudentRegistrationForm() {
             <div className="form-row">
               <div className="form-group flex-1">
                 <label htmlFor="rollNumber">University Roll Number</label>
-                <div className="input-glass-wrap">
+                <div className="input-wrap">
                   <input
                     id="rollNumber"
                     name="rollNumber"
@@ -141,9 +135,9 @@ export function StudentRegistrationForm() {
                 </div>
               </div>
 
-              <div className="form-group w-36">
+              <div className="form-group w-32">
                 <label htmlFor="semester">Semester</label>
-                <div className="input-glass-wrap select-wrap">
+                <div className="input-wrap select-wrap">
                   <select id="semester" name="semester" required defaultValue="3">
                     <option value="" disabled>Select</option>
                     {Array.from({ length: 8 }, (_, i) => (
@@ -156,8 +150,8 @@ export function StudentRegistrationForm() {
 
             <div className="form-group">
               <label htmlFor="email">Email Address</label>
-              <div className="input-glass-wrap">
-                <Mail size={17} className="input-icon" />
+              <div className="input-wrap">
+                <Mail size={16} className="input-icon" />
                 <input
                   id="email"
                   name="email"
@@ -172,7 +166,7 @@ export function StudentRegistrationForm() {
 
             <div className="form-group">
               <label htmlFor="department">Department / Branch</label>
-              <div className="input-glass-wrap">
+              <div className="input-wrap">
                 <input
                   id="department"
                   name="department"
@@ -187,8 +181,8 @@ export function StudentRegistrationForm() {
             <div className="form-row">
               <div className="form-group flex-1">
                 <label htmlFor="password">Password</label>
-                <div className="input-glass-wrap">
-                  <Lock size={17} className="input-icon" />
+                <div className="input-wrap">
+                  <Lock size={16} className="input-icon" />
                   <input
                     id="password"
                     name="password"
@@ -206,8 +200,8 @@ export function StudentRegistrationForm() {
 
               <div className="form-group flex-1">
                 <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="input-glass-wrap">
-                  <Lock size={17} className="input-icon" />
+                <div className="input-wrap">
+                  <Lock size={16} className="input-icon" />
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -228,313 +222,259 @@ export function StudentRegistrationForm() {
               Password must be at least 6 characters. You can sign in immediately after registration without delay.
             </p>
 
-            <button className="glass-auth-btn primary-btn submit-btn" type="submit" disabled={loading}>
+            <button className="auth-btn btn-primary" type="submit" disabled={loading}>
               {loading ? (
                 <>
-                  <LoaderCircle className="spin-icon" size={18} />
+                  <LoaderCircle className="spin-icon" size={16} />
                   <span>Creating student account…</span>
                 </>
               ) : (
                 <>
                   <span>Register Account</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={16} />
                 </>
               )}
             </button>
           </form>
         )}
 
-        <footer className="glass-card-footer">
-          <span>Already have an account?</span>
-          <Link href="/student/login" className="card-link">
+        <footer className="auth-footer">
+          <span>Already registered?</span>
+          <Link href="/student/login" className="auth-link">
             Sign In here
           </Link>
         </footer>
       </section>
 
-      <div className="glass-auth-nav">
+      <div className="auth-nav">
         <Link href="/" className="back-link">
-          <ArrowLeft size={15} />
-          <span>Back to Portal Directory</span>
+          <ArrowLeft size={14} />
+          <span>Back to Main Portal</span>
         </Link>
       </div>
 
-      <style>{styles}</style>
+      <style>{cleanRegisterStyles}</style>
     </main>
   );
 }
 
-const styles = `
-.glass-auth-root {
+const cleanRegisterStyles = `
+/* Clean institutional student registration */
+.auth-page-root {
   min-height: 100vh;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 18px;
-  font-family: inherit;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.glass-auth-backdrop {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
-              #f8fafc;
-}
-
-.glass-ambient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  opacity: 0.6;
-}
-.orb-top-left {
-  top: -40px;
-  left: -40px;
-  width: 340px;
-  height: 340px;
-  background: rgba(59, 130, 246, 0.22);
-}
-.orb-bottom-right {
-  bottom: -40px;
-  right: -40px;
-  width: 380px;
-  height: 380px;
-  background: rgba(147, 51, 234, 0.18);
-}
-
-.glass-auth-header {
-  position: relative;
-  z-index: 2;
+.auth-header {
   margin-bottom: 24px;
 }
-.glass-auth-brand {
+.auth-brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  color: #0f172a;
 }
-.brand-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+.auth-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #0f2b48;
   color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  display: grid;
+  place-items: center;
 }
-.brand-titles strong {
+.auth-brand-text strong {
   display: block;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.03em;
-  color: #0f172a;
+  letter-spacing: 0.04em;
+  color: #0f2b48;
   line-height: 1.1;
 }
-.brand-titles small {
+.auth-brand-text small {
   display: block;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
   color: #64748b;
-  letter-spacing: 0.12em;
-  margin-top: 3px;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
 }
 
-.glass-auth-card {
-  position: relative;
-  z-index: 2;
+.auth-card {
+  width: min(100%, 480px);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 34px 32px 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+.register-wide-card {
   width: min(100%, 540px);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 24px;
-  padding: 36px 36px 32px;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-.card-badge-row {
+.auth-card-top {
   margin-bottom: 12px;
 }
-.role-pill {
+.auth-role-pill {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 5px 12px;
-  border-radius: 9999px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 4px;
   display: inline-block;
 }
 .student-pill {
-  background: rgba(37, 99, 235, 0.1);
-  color: #1d4ed8;
-  border: 1px solid rgba(37, 99, 235, 0.2);
+  background: #eff6ff;
+  color: #1e40af;
 }
 
 .auth-title {
-  margin: 0 0 8px;
-  font-size: 26px;
+  margin: 0 0 6px;
+  font-size: 23px;
   font-weight: 800;
-  color: #0f172a;
+  color: #0f2b48;
   letter-spacing: -0.02em;
 }
 .auth-subtitle {
-  margin: 0 0 24px;
-  font-size: 13.5px;
-  color: #64748b;
-  line-height: 1.55;
-}
-
-.glass-auth-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 18px;
-  border-radius: 14px;
-  margin-bottom: 22px;
+  margin: 0 0 22px;
   font-size: 13px;
+  color: #64748b;
   line-height: 1.5;
 }
+
+.auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
 .error-alert {
-  background: rgba(254, 242, 242, 0.9);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   color: #991b1b;
 }
 .error-alert .alert-icon {
   color: #dc2626;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 .success-alert {
-  background: rgba(240, 253, 244, 0.95);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
   color: #166534;
 }
 .success-alert .alert-icon {
   color: #16a34a;
   flex-shrink: 0;
-  margin-top: 2px;
-}
-.alert-content strong {
-  display: block;
-  font-size: 13.5px;
-  font-weight: 700;
-  margin-bottom: 2px;
+  margin-top: 1px;
 }
 .mongo-help-tip {
   margin-top: 8px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
+  padding: 8px 10px;
+  background: #ffffff;
+  border-radius: 6px;
   border-left: 3px solid #dc2626;
-  font-size: 12px;
+  font-size: 11.5px;
   color: #7f1d1d;
 }
-.mongo-help-tip code {
-  background: rgba(0, 0, 0, 0.06);
-  padding: 2px 5px;
-  border-radius: 4px;
-  font-weight: 700;
-}
 
-.glass-auth-form {
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 15px;
 }
 .form-row {
   display: flex;
-  gap: 14px;
+  gap: 12px;
 }
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 .form-group label {
   font-size: 12px;
   font-weight: 700;
   color: #334155;
-  letter-spacing: 0.01em;
 }
 .flex-1 { flex: 1; }
-.w-36 { width: 140px; }
+.w-32 { width: 130px; }
 
-.input-glass-wrap {
+.input-wrap {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(203, 213, 225, 0.8);
-  border-radius: 12px;
-  padding: 0 14px;
-  height: 44px;
-  transition: all 0.2s ease;
-}
-.input-glass-wrap:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 42px;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.input-glass-wrap input,
-.input-glass-wrap select {
+.input-wrap:focus-within {
+  border-color: #0f2b48;
+  box-shadow: 0 0 0 3px rgba(15, 43, 72, 0.1);
+}
+.input-wrap input,
+.input-wrap select {
   width: 100%;
   height: 100%;
   border: 0;
   outline: 0;
   background: transparent;
   color: #0f172a;
-  font-size: 13.5px;
+  font-size: 13px;
   font-family: inherit;
 }
-.input-glass-wrap input::placeholder {
-  color: #94a3b8;
+.input-wrap input::placeholder {
+  color: #9ca3af;
 }
 .input-icon {
-  color: #94a3b8;
+  color: #64748b;
   flex-shrink: 0;
 }
 
 .form-note {
-  margin: 2px 0 6px;
+  margin: 2px 0 4px;
   font-size: 12px;
   color: #64748b;
   line-height: 1.45;
 }
 
-.glass-auth-btn {
+.auth-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  height: 48px;
-  border-radius: 12px;
+  gap: 8px;
+  height: 44px;
+  border-radius: 8px;
   border: 0;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
+  transition: background 0.15s;
+  margin-top: 4px;
 }
-.primary-btn {
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+.btn-primary {
+  background: #0f2b48;
   color: #ffffff;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
-.primary-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1e40af, #1d4ed8);
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-  transform: translateY(-1px);
+.btn-primary:hover:not(:disabled) {
+  background: #1e3a5f;
 }
-.primary-btn:disabled {
+.btn-primary:disabled {
   opacity: 0.65;
   cursor: wait;
 }
@@ -545,61 +485,57 @@ const styles = `
   to { transform: rotate(360deg); }
 }
 
-.glass-card-footer {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
+.auth-footer {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12.5px;
   color: #64748b;
 }
-.card-link {
-  color: #2563eb;
+.auth-link {
+  color: #0f2b48;
   font-weight: 700;
   text-decoration: none;
 }
-.card-link:hover {
+.auth-link:hover {
   text-decoration: underline;
 }
 
-.glass-auth-nav {
-  position: relative;
-  z-index: 2;
-  margin-top: 24px;
+.auth-nav {
+  margin-top: 22px;
 }
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #64748b;
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  transition: all 0.2s;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.15s;
 }
 .back-link:hover {
   color: #0f172a;
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-1px);
+  border-color: #cbd5e1;
 }
 
 @media (max-width: 600px) {
-  .glass-auth-card {
-    padding: 26px 20px;
-    border-radius: 18px;
+  .auth-card {
+    padding: 24px 18px;
   }
   .form-row {
     flex-direction: column;
     gap: 14px;
   }
-  .w-36 {
+  .w-32 {
     width: 100%;
   }
 }
