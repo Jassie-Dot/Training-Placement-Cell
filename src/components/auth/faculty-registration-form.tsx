@@ -63,8 +63,10 @@ export function FacultyRegistrationForm() {
   return (
     <main className="glass-auth-root">
       {/* Background ambient lighting */}
-      <div className="glass-ambient-orb orb-top-left" />
-      <div className="glass-ambient-orb orb-bottom-right" />
+      <div className="glass-auth-backdrop" aria-hidden="true">
+        <div className="glass-ambient-orb orb-top-left" />
+        <div className="glass-ambient-orb orb-bottom-right" />
+      </div>
 
       {/* Brand Header */}
       <header className="glass-auth-header">
@@ -235,15 +237,23 @@ const adminRegisterStyles = `
 .glass-auth-root {
   min-height: 100vh;
   position: relative;
-  background: radial-gradient(circle at 15% 15%, rgba(147, 51, 234, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
-              #f8fafc;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 18px 40px;
-  overflow-x: hidden;
+  justify-content: center;
+  padding: 40px 18px;
   font-family: inherit;
+}
+
+.glass-auth-backdrop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 15% 15%, rgba(147, 51, 234, 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
+              #f8fafc;
 }
 
 .glass-ambient-orb {
@@ -251,22 +261,21 @@ const adminRegisterStyles = `
   border-radius: 50%;
   filter: blur(80px);
   pointer-events: none;
-  z-index: 0;
   opacity: 0.6;
 }
 .orb-top-left {
-  top: -60px;
-  left: -60px;
-  width: 320px;
-  height: 320px;
-  background: rgba(147, 51, 234, 0.18);
+  top: -40px;
+  left: -40px;
+  width: 340px;
+  height: 340px;
+  background: rgba(147, 51, 234, 0.2);
 }
 .orb-bottom-right {
-  bottom: -60px;
-  right: -60px;
-  width: 360px;
-  height: 360px;
-  background: rgba(59, 130, 246, 0.18);
+  bottom: -40px;
+  right: -40px;
+  width: 380px;
+  height: 380px;
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .glass-auth-header {

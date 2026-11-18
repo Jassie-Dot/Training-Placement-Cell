@@ -15,5 +15,23 @@ export default async function FacultyLayout({ children }: { children: ReactNode 
     Notification.countDocuments({ recipient: principal.userId, channel: "IN_APP", readAt: null }),
     Notification.find({ recipient: principal.userId, channel: "IN_APP" }).sort({ createdAt: -1 }).limit(5).select("title body readAt createdAt").lean(),
   ]);
-  return <div className="faculty-frame"><FacultySidebar /><div className="faculty-main"><FacultyHeader facultyName={faculty?.fullName ?? "Faculty member"} email={faculty?.email ?? ""} unreadCount={unreadCount} notifications={notices.map((notice) => ({ id: notice._id.toString(), title: notice.title, body: notice.body, unread: !notice.readAt }))} />{children}</div></div>;
+  return (
+    <div className="faculty-frame">
+      <FacultySidebar />
+      <div className="faculty-main">
+        <FacultyHeader
+          facultyName={faculty?.fullName ?? "Administrator"}
+          email={faculty?.email ?? ""}
+          unreadCount={unreadCount}
+          notifications={notices.map((notice) => ({
+            id: notice._id.toString(),
+            title: notice.title,
+            body: notice.body,
+            unread: !notice.readAt,
+          }))}
+        />
+        {children}
+      </div>
+    </div>
+  );
 }
