@@ -62,21 +62,21 @@ export function FacultySidebar() {
         </button>
         <nav className="faculty-nav" aria-label="Admin navigation">
           <span className="nav-section sidebar-label">OVERVIEW</span>
-          <Link title="Overview" className={linkClass("/faculty/dashboard")} href="/faculty/dashboard" onClick={closeMobile}>
+          <Link prefetch={true} title="Overview" className={linkClass("/faculty/dashboard")} href="/faculty/dashboard" onClick={closeMobile}>
             <LayoutDashboard size={18} />
             <span className="sidebar-label">Dashboard</span>
           </Link>
 
           <span className="nav-section sidebar-label">STUDENT MANAGEMENT</span>
-          <Link title="All Students" className={linkClass("/faculty/students")} href="/faculty/students" onClick={closeMobile}>
+          <Link prefetch={true} title="All Students" className={linkClass("/faculty/students")} href="/faculty/students" onClick={closeMobile}>
             <Users size={18} />
             <span className="sidebar-label">All Students</span>
           </Link>
-          <Link title="Add Student" className={linkClass("/faculty/students/new")} href="/faculty/students/new" onClick={closeMobile}>
+          <Link prefetch={true} title="Add Student" className={linkClass("/faculty/students/new")} href="/faculty/students/new" onClick={closeMobile}>
             <UserPlus size={18} />
             <span className="sidebar-label">Add Student</span>
           </Link>
-          <Link title="Import Excel / CSV" className={linkClass("/faculty/students/import")} href="/faculty/students/import" onClick={closeMobile}>
+          <Link prefetch={true} title="Import Excel / CSV" className={linkClass("/faculty/students/import")} href="/faculty/students/import" onClick={closeMobile}>
             <FileSpreadsheet size={18} />
             <span className="sidebar-label">Import Excel Data</span>
           </Link>
@@ -90,24 +90,24 @@ export function FacultySidebar() {
                 <ChevronDown className="training-chevron sidebar-label" size={14} />
               </summary>
               <div className="training-subnav">
-                <Link href={`/faculty/trainings/${code}`} onClick={closeMobile}>Overview</Link>
-                <Link href={`/faculty/trainings/${code}/students`} onClick={closeMobile}>Students</Link>
-                <Link href={`/faculty/trainings/${code}/reports`} onClick={closeMobile}>Reports</Link>
-                <Link href={`/faculty/trainings/${code}/analytics`} onClick={closeMobile}>Analytics</Link>
+                <Link prefetch={true} href={`/faculty/trainings/${code}`} onClick={closeMobile}>Overview</Link>
+                <Link prefetch={true} href={`/faculty/trainings/${code}/students`} onClick={closeMobile}>Students</Link>
+                <Link prefetch={true} href={`/faculty/trainings/${code}/reports`} onClick={closeMobile}>Reports</Link>
+                <Link prefetch={true} href={`/faculty/trainings/${code}/analytics`} onClick={closeMobile}>Analytics</Link>
               </div>
             </details>
           ))}
 
           <span className="nav-section sidebar-label">SYSTEM</span>
-          <Link title="Notifications" className={linkClass("/faculty/notifications")} href="/faculty/notifications" onClick={closeMobile}>
+          <Link prefetch={true} title="Notifications" className={linkClass("/faculty/notifications")} href="/faculty/notifications" onClick={closeMobile}>
             <Bell size={18} />
             <span className="sidebar-label">Notifications</span>
           </Link>
-          <Link title="Reports & Exports" className={linkClass("/faculty/reports")} href="/faculty/reports" onClick={closeMobile}>
+          <Link prefetch={true} title="Reports & Exports" className={linkClass("/faculty/reports")} href="/faculty/reports" onClick={closeMobile}>
             <FileBarChart2 size={18} />
             <span className="sidebar-label">Reports &amp; Exports</span>
           </Link>
-          <Link title="Settings" className={linkClass("/faculty/settings")} href="/faculty/settings" onClick={closeMobile}>
+          <Link prefetch={true} title="Settings" className={linkClass("/faculty/settings")} href="/faculty/settings" onClick={closeMobile}>
             <Settings2 size={18} />
             <span className="sidebar-label">Settings</span>
           </Link>

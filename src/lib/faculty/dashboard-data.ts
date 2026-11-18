@@ -13,14 +13,76 @@ export const trainingCodes = ["TR-101", "TR-102", "TR-103", "TR-104"] as const;
 export type TrainingCode = (typeof trainingCodes)[number];
 export function isTrainingCode(value: string): value is TrainingCode { return (trainingCodes as readonly string[]).includes(value); }
 
-export async function getFacultyName(userId: string) {
-  await connectMongo();
-  const faculty = await Faculty.findOne({ user: userId, status: "ACTIVE", deletedAt: null }).select("fullName email").lean();
-  return faculty ? { fullName: faculty.fullName, email: faculty.email } : null;
+export type FacultyOverview = {
+  totalStudents: number;
+  totalEnrollments: number;
+  activeTrainings: number;
+  reportsSubmitted: number;
+  pendingReviews: number;
+  approved: number;
+  rejected: number;
+  overdue: number;
+  overduePercentage: number;
+  reportingCompliance: number;
+  approvalRatio: number;
+  departmentStats: { department: string; students: number; submissions: number; approved: number; rejected: number }[];
+  semesterStats: { semester: number; students: number; submissions: number; approved: number; rejected: number }[];
+  distribution: { code: string; students: number }[];
+  reportStatuses: { status: string; count: number }[];
+  trainingSummaries: {
+    code: string;
+    name: string;
+    students: number;
+    submitted: number;
+    approved: number;
+    rejected: number;
+    approvalRate: number;
+    overdue: number;
+  }[];
+  activity: { id: string; action: string; entityType: string; occurredAt: string; metadata?: Record<string, unknown> }[];
+};
+
+export type TrainingDashboardData = {
+  training: any;
+  students: number;
+  submitted: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  overdue: number;
+  statuses: { status: string; count: number }[];
+  progress: number;
+};
+
+// High-speed in-memory cache to eliminate repeated 2-second MongoDB roundtrips
+type CacheEntry<T> = { data: T; expiresAt: number };
+const overviewCache = new Map<string, CacheEntry<any>>();
+const CACHE_TTL_MS = 45_000; // 45 seconds cache
+
+export function invalidateFacultyCache() {
+  overviewCache.clear();
 }
 
-export async function getFacultyOverview() {
+export async function getFacultyName(userId: string): Promise<{ fullName: string; email: string } | null> {
+  const cacheKey = `faculty-name:${userId}`;
+  const cached = overviewCache.get(cacheKey);
+  if (cached && Date.now() < cached.expiresAt) return cached.data;
+
+  await connectMongo();
+  const faculty = await Faculty.findOne({ user: userId, status: "ACTIVE", deletedAt: null }).select("fullName email").lean();
+  const result = faculty ? { fullName: faculty.fullName, email: faculty.email } : null;
+  overviewCache.set(cacheKey, { data: result, expiresAt: Date.now() + CACHE_TTL_MS });
+  return result;
+}
+
+export async function getFacultyOverview(): Promise<FacultyOverview> {
   const principal = await requirePermission("ANALYTICS_READ");
+  const cacheKey = `overview:${principal.userId}:${principal.trainingCodes.join(",")}`;
+  const cached = overviewCache.get(cacheKey);
+  if (cached && Date.now() < cached.expiresAt) {
+    return cached.data;
+  }
+
   await connectMongo();
   const visibleCodes = principal.trainingCodes.length ? trainingCodes.filter((code) => principal.trainingCodes.includes(code)) : [...trainingCodes];
   const trainings = await Training.find({ code: { $in: visibleCodes } }).select("_id code name description status startDate endDate").lean();
@@ -69,7 +131,7 @@ export async function getFacultyOverview() {
   const requiredTasks = duePeriods.reduce((sum, period) => sum + activeEnrollmentRows.filter((row) => row.training.toString() === period.training.toString() && (!row.startDate || row.startDate <= (period.extensionUntil ?? period.dueDate))).length, 0);
   const overdueDenominator = requiredTasks;
   const submittedTasks = requiredTasks ? await Report.countDocuments({ enrollment: { $in: activeEnrollmentRows.map((row) => row._id) }, reportingPeriod: { $in: duePeriods.map((row) => row._id) }, deletedAt: null }) : 0;
-  return {
+  const overviewData = {
     totalStudents, totalEnrollments, activeTrainings: trainings.filter((t) => t.status === "ACTIVE").length,
     reportsSubmitted: Object.values(statusCounts).reduce((a, b) => a + b, 0),
     pendingReviews: (statusCounts.SUBMITTED ?? 0) + (statusCounts.UNDER_REVIEW ?? 0),
@@ -85,6 +147,9 @@ export async function getFacultyOverview() {
     trainingSummaries,
     activity: activity.map((item) => ({ id: item._id.toString(), action: item.action, entityType: item.entityType, occurredAt: item.occurredAt.toISOString(), metadata: item.metadata as Record<string, unknown> })),
   };
+
+  overviewCache.set(cacheKey, { data: overviewData, expiresAt: Date.now() + CACHE_TTL_MS });
+  return overviewData;
 }
 
 export async function getOverdueByTraining(codes: readonly TrainingCode[] = trainingCodes) {
@@ -108,7 +173,11 @@ export async function getOverdueByTraining(codes: readonly TrainingCode[] = trai
   return Object.fromEntries(results) as Record<TrainingCode, number>;
 }
 
-export async function getTrainingDashboard(code: TrainingCode) {
+export async function getTrainingDashboard(code: TrainingCode): Promise<TrainingDashboardData | null> {
+  const cacheKey = `training-dash:${code}`;
+  const cached = overviewCache.get(cacheKey);
+  if (cached && Date.now() < cached.expiresAt) return cached.data;
+
   await requireTrainingPermission("ANALYTICS_READ", code);
   await connectMongo();
   const training = await Training.findOne({ code }).select("code name description status startDate endDate reportingFrequencyDays").lean();
@@ -124,5 +193,7 @@ export async function getTrainingDashboard(code: TrainingCode) {
   ]);
   const statuses = Object.fromEntries(statusRows.map((row) => [row._id, row.count])) as Record<string, number>;
   const submitted = Object.values(statuses).reduce((a, b) => a + b, 0);
-  return { training: { ...training, _id: training._id.toString() }, students, submitted, pending: (statuses.SUBMITTED ?? 0) + (statuses.UNDER_REVIEW ?? 0), approved: statuses.APPROVED ?? 0, rejected: (statuses.REJECTED ?? 0) + (statuses.RESUBMISSION_REQUIRED ?? 0), overdue: overdue[code] ?? 0, statuses: ["SUBMITTED", "UNDER_REVIEW", "APPROVED", "REJECTED", "RESUBMISSION_REQUIRED"].map((status) => ({ status: status.replaceAll("_", " "), count: statuses[status] ?? 0 })), progress: students ? Math.min(100, Math.round(((statuses.APPROVED ?? 0) / students) * 100)) : 0 };
+  const result = { training: { ...training, _id: training._id.toString() }, students, submitted, pending: (statuses.SUBMITTED ?? 0) + (statuses.UNDER_REVIEW ?? 0), approved: statuses.APPROVED ?? 0, rejected: (statuses.REJECTED ?? 0) + (statuses.RESUBMISSION_REQUIRED ?? 0), overdue: overdue[code] ?? 0, statuses: ["SUBMITTED", "UNDER_REVIEW", "APPROVED", "REJECTED", "RESUBMISSION_REQUIRED"].map((status) => ({ status: status.replaceAll("_", " "), count: statuses[status] ?? 0 })), progress: students ? Math.min(100, Math.round(((statuses.APPROVED ?? 0) / students) * 100)) : 0 };
+  overviewCache.set(cacheKey, { data: result, expiresAt: Date.now() + CACHE_TTL_MS });
+  return result;
 }

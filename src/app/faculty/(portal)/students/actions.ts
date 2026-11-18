@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createStudentRecord, setStudentTrainingAssignments, setStudentStatus, updateStudentRecord } from "@/lib/faculty/student-service";
+import { invalidateFacultyCache } from "@/lib/faculty/dashboard-data";
 
 function getInput(form: FormData) {
   return {
@@ -12,17 +13,26 @@ function getInput(form: FormData) {
 }
 export async function createStudentAction(_state: { error: string }, form: FormData): Promise<{ error: string }> {
   let studentId: string;
-  try { ({ studentId } = await createStudentRecord(getInput(form))); }
+  try {
+    ({ studentId } = await createStudentRecord(getInput(form)));
+    invalidateFacultyCache();
+  }
   catch (error) { return { error: error instanceof Error ? error.message : "Student could not be created." }; }
   revalidatePath("/faculty/students"); redirect(`/faculty/students/${studentId}`);
 }
 export async function updateStudentAction(studentId: string, form: FormData) {
-  await updateStudentRecord(studentId, getInput(form)); revalidatePath(`/faculty/students/${studentId}`); revalidatePath("/faculty/students");
+  await updateStudentRecord(studentId, getInput(form));
+  invalidateFacultyCache();
+  revalidatePath(`/faculty/students/${studentId}`); revalidatePath("/faculty/students");
 }
 export async function assignStudentAction(studentId: string, form: FormData) {
-  await setStudentTrainingAssignments(studentId, form.getAll("trainingCodes").map(String)); revalidatePath(`/faculty/students/${studentId}`); revalidatePath("/faculty/trainings");
+  await setStudentTrainingAssignments(studentId, form.getAll("trainingCodes").map(String));
+  invalidateFacultyCache();
+  revalidatePath(`/faculty/students/${studentId}`); revalidatePath("/faculty/trainings");
 }
 export async function studentStatusAction(studentId: string, form: FormData) {
   const status = form.get("status"); if (status !== "ACTIVE" && status !== "INACTIVE" && status !== "GRADUATED") throw new Error("Choose a valid account status.");
-  await setStudentStatus(studentId, status); revalidatePath(`/faculty/students/${studentId}`); revalidatePath("/faculty/students");
+  await setStudentStatus(studentId, status);
+  invalidateFacultyCache();
+  revalidatePath(`/faculty/students/${studentId}`); revalidatePath("/faculty/students");
 }
