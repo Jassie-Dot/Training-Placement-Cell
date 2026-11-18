@@ -30,6 +30,11 @@ export async function connectMongo() {
   } catch (error) {
     cache.promise = null;
     cache.connection = null;
-    throw new Error("Unable to connect to MongoDB.", { cause: error });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("MongoDB connection failed:", msg);
+    if (msg.includes("ETIMEDOUT") || msg.includes("timed out") || msg.includes("ServerSelection") || msg.includes("ENOTFOUND")) {
+      throw new Error("Unable to connect to MongoDB. Please ensure MongoDB Atlas Network Access allows connections from anywhere (0.0.0.0/0) for Vercel deployments.", { cause: error });
+    }
+    throw new Error(`Unable to connect to MongoDB: ${msg}`, { cause: error });
   }
 }

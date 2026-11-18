@@ -3,7 +3,19 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { Eye, EyeOff, GraduationCap, LoaderCircle, LockKeyhole, Mail, UserRound } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 
 type Mode = "otp" | "password";
 
@@ -18,31 +30,52 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(0);
+
   const teacher = role === "teacher";
   const destination = teacher ? "/faculty/dashboard" : "/student/dashboard";
 
   useEffect(() => {
     if (!codeRequested) return;
-    const timer = window.setInterval(() => setSecondsLeft((seconds) => Math.max(0, seconds - 1)), 1000);
+    const timer = window.setInterval(
+      () => setSecondsLeft((seconds) => Math.max(0, seconds - 1)),
+      1000
+    );
     return () => window.clearInterval(timer);
   }, [codeRequested]);
 
   async function requestCode(event?: FormEvent) {
     event?.preventDefault();
-    setLoading(true); setError(""); setInfo("");
+    setLoading(true);
+    setError("");
+    setInfo("");
     try {
       const response = await fetch("/api/auth/otp/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: teacher ? "TEACHER" : "STUDENT", identifier }),
+        body: JSON.stringify({
+          role: teacher ? "TEACHER" : "STUDENT",
+          identifier,
+        }),
       });
-      const result = await response.json() as { message?: string; error?: string; retryAfterSeconds?: number };
-      if (!response.ok) { setError(result.error ?? "Verification is temporarily unavailable. Please try again."); return; }
+      const result = (await response.json()) as {
+        message?: string;
+        error?: string;
+        retryAfterSeconds?: number;
+      };
+      if (!response.ok) {
+        setError(
+          result.error ?? "Verification is temporarily unavailable. Please try again."
+        );
+        return;
+      }
       setCodeRequested(true);
       setSecondsLeft(result.retryAfterSeconds ?? 60);
-      setInfo(result.message ?? "If the account is eligible, a code will be sent to its registered email.");
+      setInfo(
+        result.message ??
+          "If the account is eligible, a code will be sent to its registered email."
+      );
     } catch {
-      setError("Verification is temporarily unavailable. Please try again.");
+      setError("Verification service unreachable. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -50,10 +83,21 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
 
   async function verifyCode(event: FormEvent) {
     event.preventDefault();
-    setLoading(true); setError("");
+    setLoading(true);
+    setError("");
     try {
-      const result = await signIn(`${role}-otp`, { identifier, otp: code, redirect: false });
-      if (result?.error) { setError("The code could not be verified. It may be incorrect, expired, or already used."); setLoading(false); return; }
+      const result = await signIn(`${role}-otp`, {
+        identifier,
+        otp: code,
+        redirect: false,
+      });
+      if (result?.error) {
+        setError(
+          "The verification code could not be verified. It may be incorrect, expired, or already used."
+        );
+        setLoading(false);
+        return;
+      }
       window.location.assign(destination);
     } catch {
       setError("Sign-in is temporarily unavailable. Please try again.");
@@ -62,10 +106,22 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
   }
 
   async function passwordSignIn(event: FormEvent) {
-    event.preventDefault(); setLoading(true); setError("");
+    event.preventDefault();
+    setLoading(true);
+    setError("");
     try {
-      const result = await signIn(role, { identifier, password, redirect: false });
-      if (result?.error) { setError("Invalid credentials. Please check your email/roll number and password."); setLoading(false); return; }
+      const result = await signIn(role, {
+        identifier,
+        password,
+        redirect: false,
+      });
+      if (result?.error) {
+        setError(
+          "Invalid credentials. Please verify your email / roll number and password."
+        );
+        setLoading(false);
+        return;
+      }
       window.location.assign(destination);
     } catch {
       setError("Sign-in is temporarily unavailable. Please try again.");
@@ -74,143 +130,653 @@ export function LoginForm({ role }: { role: "teacher" | "student" }) {
   }
 
   return (
-    <main className="login-page">
-      <Link href="/" className="login-brand">
-        <span><GraduationCap size={22} /></span>
-        <b>GNDEC <small>TRAINING &amp; PLACEMENT</small></b>
-      </Link>
-      <section className="login-card">
-        <div className="login-symbol">{teacher ? <UserRound size={21} /> : <GraduationCap size={23} />}</div>
-        <p className="login-kicker">{teacher ? "TEACHER PORTAL" : "STUDENT PORTAL"}</p>
-        <h1>{codeRequested && mode === "otp" ? "Check your email" : teacher ? "Welcome back" : "Sign in to continue"}</h1>
-        <p className="login-subtitle">
+    <main className="glass-auth-root">
+      {/* Background ambient lighting */}
+      <div className="glass-ambient-orb orb-top-left" />
+      <div className="glass-ambient-orb orb-bottom-right" />
+
+      {/* Header */}
+      <header className="glass-auth-header">
+        <Link href="/" className="glass-auth-brand">
+          <span className="brand-icon">
+            <GraduationCap size={22} />
+          </span>
+          <div className="brand-titles">
+            <strong>GNDEC</strong>
+            <small>TRAINING &amp; PLACEMENT CELL</small>
+          </div>
+        </Link>
+      </header>
+
+      {/* Main Glass Card */}
+      <section className="glass-auth-card">
+        <div className="card-badge-row">
+          <span
+            className={`role-pill ${
+              teacher ? "admin-pill" : "student-pill"
+            }`}
+          >
+            {teacher ? "ADMINISTRATOR PORTAL" : "STUDENT PORTAL"}
+          </span>
+        </div>
+
+        <h1 className="auth-title">
+          {codeRequested && mode === "otp"
+            ? "Check your email"
+            : teacher
+            ? "Admin Sign In"
+            : "Student Sign In"}
+        </h1>
+        <p className="auth-subtitle">
           {teacher
-            ? "Sign in with your registered faculty email and password."
-            : "Sign in with your registered email or university roll number."}
+            ? "Sign in with your registered administrator email and password to manage student records."
+            : "Sign in with your registered email or university roll number to view your training status."}
         </p>
 
+        {error && (
+          <div className="glass-auth-alert error-alert" role="alert">
+            <AlertCircle className="alert-icon" size={18} />
+            <div className="alert-content">
+              <strong>Authentication issue</strong>
+              <p>{error}</p>
+            </div>
+          </div>
+        )}
+
+        {info && (
+          <div className="glass-auth-alert info-alert" role="status">
+            <div className="alert-content">
+              <p>{info}</p>
+            </div>
+          </div>
+        )}
+
         {mode === "password" && (
-          <form onSubmit={passwordSignIn}>
-            <label htmlFor="identifier-password">{teacher ? "Email address" : "Email or University Roll Number"}</label>
-            <div className="login-input-wrap">
-              <Mail size={17} />
-              <input
-                id="identifier-password"
-                name="identifier"
-                type="text"
-                autoComplete="username"
-                required
-                maxLength={254}
-                value={identifier}
-                onChange={(event) => setIdentifier(event.target.value)}
-                placeholder={teacher ? "name@gmail.com" : "email@gndec.ac.in or 2104123"}
-              />
+          <form className="glass-auth-form" onSubmit={passwordSignIn}>
+            <div className="form-group">
+              <label htmlFor="identifier-password">
+                {teacher ? "Admin Email Address" : "Email or University Roll Number"}
+              </label>
+              <div className="input-glass-wrap">
+                <Mail size={17} className="input-icon" />
+                <input
+                  id="identifier-password"
+                  name="identifier"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  maxLength={254}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder={
+                    teacher
+                      ? "admin@gmail.com"
+                      : "email@gndec.ac.in or 2514592"
+                  }
+                />
+              </div>
             </div>
 
-            <label htmlFor="password">Password</label>
-            <div className="login-input-wrap">
-              <LockKeyhole size={17} />
-              <input
-                id="password"
-                name="password"
-                type={visible ? "text" : "password"}
-                autoComplete="current-password"
-                required
-                maxLength={200}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Enter your password"
-              />
-              <button className="password-toggle" type="button" onClick={() => setVisible((v) => !v)} aria-label={visible ? "Hide password" : "Show password"}>
-                {visible ? <EyeOff size={17} /> : <Eye size={17} />}
-              </button>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <div className="input-glass-wrap">
+                <LockKeyhole size={17} className="input-icon" />
+                <input
+                  id="password"
+                  name="password"
+                  type={visible ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  maxLength={200}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                />
+                <button
+                  className="password-toggle"
+                  type="button"
+                  onClick={() => setVisible((v) => !v)}
+                  aria-label={visible ? "Hide password" : "Show password"}
+                >
+                  {visible ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
             </div>
 
-            {error && <p className="login-error" role="alert">{error}</p>}
-
-            <button className="login-submit" disabled={loading}>
-              {loading ? <><LoaderCircle className="spin" size={17} /> Signing in…</> : <>Sign in <span>→</span></>}
+            <button
+              className="glass-auth-btn primary-btn submit-btn"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <LoaderCircle className="spin-icon" size={18} />
+                  <span>Signing in…</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
             </button>
-            <button className="login-mode-link" type="button" onClick={() => { setMode("otp"); setCodeRequested(false); setError(""); }}>
-              Sign in with email OTP code instead
+
+            <button
+              className="toggle-mode-btn"
+              type="button"
+              onClick={() => {
+                setMode("otp");
+                setCodeRequested(false);
+                setError("");
+              }}
+            >
+              Sign in with Email OTP code instead
             </button>
           </form>
         )}
 
         {mode === "otp" && !codeRequested && (
-          <form onSubmit={requestCode}>
-            <label htmlFor="identifier">Registered email address</label>
-            <div className="login-input-wrap">
-              <Mail size={17} />
-              <input
-                id="identifier"
-                name="identifier"
-                type="email"
-                autoComplete="username"
-                required
-                maxLength={254}
-                value={identifier}
-                onChange={(event) => setIdentifier(event.target.value)}
-                placeholder={teacher ? "name@gmail.com" : "name@gndec.ac.in"}
-              />
+          <form className="glass-auth-form" onSubmit={requestCode}>
+            <div className="form-group">
+              <label htmlFor="identifier">Registered Email Address</label>
+              <div className="input-glass-wrap">
+                <Mail size={17} className="input-icon" />
+                <input
+                  id="identifier"
+                  name="identifier"
+                  type="email"
+                  autoComplete="username"
+                  required
+                  maxLength={254}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder={teacher ? "admin@gmail.com" : "student@gndec.ac.in"}
+                />
+              </div>
             </div>
-            {error && <p className="login-error" role="alert">{error}</p>}
-            <button className="login-submit" disabled={loading}>
-              {loading ? <><LoaderCircle className="spin" size={17} /> Sending…</> : <>Send sign-in code <span>→</span></>}
+
+            <button
+              className="glass-auth-btn primary-btn submit-btn"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <LoaderCircle className="spin-icon" size={18} />
+                  <span>Sending code…</span>
+                </>
+              ) : (
+                <>
+                  <span>Send One-Time Code</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
             </button>
-            <button className="login-mode-link" type="button" onClick={() => { setMode("password"); setError(""); }}>
+
+            <button
+              className="toggle-mode-btn"
+              type="button"
+              onClick={() => {
+                setMode("password");
+                setError("");
+              }}
+            >
               Use password instead
             </button>
           </form>
         )}
 
         {mode === "otp" && codeRequested && (
-          <form onSubmit={verifyCode}>
-            <p className="otp-delivery-note">Enter the 6-digit one-time code sent to your email.</p>
-            <label htmlFor="otp">Six-digit code</label>
-            <div className="login-input-wrap otp-input">
-              <Mail size={17} />
-              <input
-                id="otp"
-                name="otp"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                pattern="[0-9]{6}"
-                maxLength={6}
-                required
-                value={code}
-                onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                placeholder="000000"
-              />
+          <form className="glass-auth-form" onSubmit={verifyCode}>
+            <div className="form-group">
+              <label htmlFor="otp">Enter 6-digit Code</label>
+              <div className="input-glass-wrap otp-wrap">
+                <Mail size={17} className="input-icon" />
+                <input
+                  id="otp"
+                  name="otp"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  required
+                  value={code}
+                  onChange={(e) =>
+                    setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
+                  placeholder="000000"
+                />
+              </div>
             </div>
-            {error && <p className="login-error" role="alert">{error}</p>}
-            {info && <p className="login-info" role="status">{info}</p>}
-            <button className="login-submit" disabled={loading || code.length !== 6}>
-              {loading ? <><LoaderCircle className="spin" size={17} /> Verifying…</> : <>Verify and sign in <span>→</span></>}
+
+            <button
+              className="glass-auth-btn primary-btn submit-btn"
+              type="submit"
+              disabled={loading || code.length !== 6}
+            >
+              {loading ? (
+                <>
+                  <LoaderCircle className="spin-icon" size={18} />
+                  <span>Verifying…</span>
+                </>
+              ) : (
+                <>
+                  <span>Verify and Sign In</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
             </button>
-            <div className="otp-actions">
-              <button type="button" disabled={loading || secondsLeft > 0} onClick={() => { setCodeRequested(false); setCode(""); setInfo(""); }}>Use different account</button>
-              <button type="button" disabled={loading || secondsLeft > 0} onClick={() => void requestCode()}>{secondsLeft > 0 ? `Resend in ${secondsLeft}s` : "Resend code"}</button>
+
+            <div className="otp-actions-row">
+              <button
+                type="button"
+                className="sub-action-btn"
+                disabled={loading || secondsLeft > 0}
+                onClick={() => {
+                  setCodeRequested(false);
+                  setCode("");
+                  setInfo("");
+                }}
+              >
+                Use different account
+              </button>
+              <button
+                type="button"
+                className="sub-action-btn"
+                disabled={loading || secondsLeft > 0}
+                onClick={() => void requestCode()}
+              >
+                {secondsLeft > 0 ? `Resend in ${secondsLeft}s` : "Resend code"}
+              </button>
             </div>
-            <p className="login-security-note">Never share this code. GNDEC staff will not ask you for it.</p>
-            <button className="login-mode-link" type="button" onClick={() => { setMode("password"); setError(""); }}>
+
+            <button
+              className="toggle-mode-btn"
+              type="button"
+              onClick={() => {
+                setMode("password");
+                setError("");
+              }}
+            >
               Use password instead
             </button>
           </form>
         )}
 
-        <p className="login-help">
+        <footer className="glass-card-footer">
           {teacher ? (
-            <>New teacher? <Link href="/faculty/register" style={{ color: "#35669b", fontWeight: 700 }}>Register for teacher access</Link>.</>
+            <>
+              <span>New administrator?</span>
+              <Link href="/faculty/register" className="card-link">
+                Register Admin Account
+              </Link>
+            </>
           ) : (
-            <>New student? <Link href="/student/register" style={{ color: "#35669b", fontWeight: 700 }}>Create an account</Link>.</>
+            <>
+              <span>New student?</span>
+              <Link href="/student/register" className="card-link">
+                Create an account
+              </Link>
+            </>
           )}
-        </p>
+        </footer>
       </section>
-      <Link className="login-back" href="/">← Back to the GNDEC T&amp;P portal</Link>
-      <style>{styles}</style>
+
+      <div className="glass-auth-nav">
+        <Link href="/" className="back-link">
+          <ArrowLeft size={15} />
+          <span>Back to Portal Directory</span>
+        </Link>
+      </div>
+
+      <style>{loginStyles}</style>
     </main>
   );
 }
 
-const styles = `.login-page{min-height:100vh;padding:30px 20px 24px;background:#f5f7fa;display:flex;align-items:center;flex-direction:column;color:#172033}.login-brand{display:flex;align-items:center;gap:10px;color:#142b4a;font-size:15px;letter-spacing:.04em}.login-brand>span{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:#e8eff8}.login-brand small{display:block;font-size:8px;color:#718096;letter-spacing:.12em;margin-top:3px}.login-card{width:min(100%,430px);margin:auto;padding:35px 38px;background:#fff;border:1px solid #e5eaf1;border-radius:12px;box-shadow:0 16px 42px rgba(20,43,74,.07)}.login-symbol{width:43px;height:43px;border-radius:11px;background:#edf3fb;color:#3b6599;display:grid;place-items:center}.login-kicker{margin:21px 0 8px;color:#4772a6;font-size:9px;letter-spacing:.15em;font-weight:700}.login-card h1{margin:0;color:#142b4a;font-size:27px;letter-spacing:-.03em}.login-subtitle{margin:9px 0 25px;color:#718096;font-size:12px;line-height:1.6}.login-card label{display:block;margin:17px 0 7px;font-size:11px;font-weight:700;color:#38465a}.login-input-wrap{height:45px;border:1px solid #dbe2eb;border-radius:6px;display:flex;align-items:center;gap:10px;padding:0 12px;color:#8a97a8}.login-input-wrap:focus-within{border-color:#6b91bf;box-shadow:0 0 0 3px rgba(37,99,235,.08)}.login-input-wrap input{height:100%;width:100%;border:0;outline:0;color:#172033;background:transparent;font-size:12px}.login-input-wrap input::placeholder{color:#a3adba}.otp-input input{text-align:center;letter-spacing:.3em;font-size:18px}.password-toggle{display:grid;place-items:center;border:0;background:transparent;color:#8491a2;cursor:pointer;padding:4px}.login-error{color:#b42318;font-size:11px;line-height:1.5;margin:12px 0}.login-info{color:#356c4d;background:#eff8f2;border-radius:5px;padding:9px;font-size:10px;line-height:1.5}.login-submit{width:100%;height:45px;margin-top:23px;background:#142b4a;color:white;border:0;border-radius:6px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer}.login-submit:disabled{opacity:.7;cursor:wait}.login-submit span{font-size:17px;font-weight:400}.login-help{margin:20px 0 0;padding-top:17px;border-top:1px solid #edf0f4;color:#7e8a9b;font-size:10px;line-height:1.65}.login-back{font-size:11px;color:#557398}.login-mode-link,.otp-actions button{display:block;margin:14px auto 0;border:0;background:transparent;color:#35669b;font-size:10px;cursor:pointer}.otp-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}.otp-actions button{margin:13px 0 0}.otp-actions button:disabled{color:#9ba6b3;cursor:default}.otp-delivery-note,.login-security-note{color:#768398;font-size:10px;line-height:1.6}.otp-delivery-note{margin:0 0 15px}.login-security-note{text-align:center;margin:13px 0 0}.spin{animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:500px){.login-page{padding:24px 16px 20px}.login-card{padding:30px 24px}.login-card h1{font-size:24px}}`;
+const loginStyles = `
+.glass-auth-root {
+  min-height: 100vh;
+  position: relative;
+  background: radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+              #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 18px 40px;
+  overflow-x: hidden;
+  font-family: inherit;
+}
+
+.glass-ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+.orb-top-left {
+  top: -60px;
+  left: -60px;
+  width: 320px;
+  height: 320px;
+  background: rgba(59, 130, 246, 0.2);
+}
+.orb-bottom-right {
+  bottom: -60px;
+  right: -60px;
+  width: 360px;
+  height: 360px;
+  background: rgba(147, 51, 234, 0.16);
+}
+
+.glass-auth-header {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 24px;
+}
+.glass-auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #0f172a;
+}
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+.brand-titles strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: #0f172a;
+  line-height: 1.1;
+}
+.brand-titles small {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.12em;
+  margin-top: 3px;
+}
+
+.glass-auth-card {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 460px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  padding: 36px 34px 32px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.card-badge-row {
+  margin-bottom: 12px;
+}
+.role-pill {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  display: inline-block;
+}
+.student-pill {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+.admin-pill {
+  background: rgba(147, 51, 234, 0.1);
+  color: #7e22ce;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.auth-title {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+.auth-subtitle {
+  margin: 0 0 24px;
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.glass-auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.error-alert {
+  background: rgba(254, 242, 242, 0.9);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #991b1b;
+}
+.error-alert .alert-icon {
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.info-alert {
+  background: rgba(239, 246, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #1e40af;
+}
+
+.glass-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.input-glass-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 12px;
+  padding: 0 14px;
+  height: 45px;
+  transition: all 0.2s ease;
+}
+.input-glass-wrap:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background: #ffffff;
+}
+.input-glass-wrap input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #0f172a;
+  font-size: 13.5px;
+  font-family: inherit;
+}
+.input-glass-wrap input::placeholder {
+  color: #94a3b8;
+}
+.otp-wrap input {
+  text-align: center;
+  letter-spacing: 0.25em;
+  font-size: 18px;
+  font-weight: 700;
+}
+.input-icon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+.password-toggle {
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+}
+.password-toggle:hover {
+  color: #334155;
+}
+
+.glass-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  border-radius: 12px;
+  border: 0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 6px;
+}
+.primary-btn {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+.primary-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1e40af, #1d4ed8);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+}
+.primary-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.spin-icon {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.toggle-mode-btn {
+  background: transparent;
+  border: 0;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 4px;
+}
+.toggle-mode-btn:hover {
+  text-decoration: underline;
+}
+
+.otp-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+}
+.sub-action-btn {
+  background: transparent;
+  border: 0;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px;
+}
+.sub-action-btn:hover:not(:disabled) {
+  color: #0f172a;
+}
+.sub-action-btn:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.glass-card-footer {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+.card-link {
+  color: #2563eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+.card-link:hover {
+  text-decoration: underline;
+}
+
+.glass-auth-nav {
+  position: relative;
+  z-index: 2;
+  margin-top: 24px;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.2s;
+}
+.back-link:hover {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 500px) {
+  .glass-auth-card {
+    padding: 26px 20px;
+    border-radius: 18px;
+  }
+}
+`;
