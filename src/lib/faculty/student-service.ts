@@ -26,6 +26,17 @@ const studentInputBaseSchema = z.object({
   academicYear: z.string().trim().max(20).optional().transform((value) => value || undefined),
   cgpa: z.preprocess((value) => value === "" || value === null ? undefined : value, z.coerce.number().min(0).max(10).optional()),
   contactNumber: z.string().trim().max(24).optional().transform((value) => value || undefined).refine((value) => !value || /^[+\d\s().-]{7,24}$/.test(value), "Enter a valid contact number."),
+  companyName: z.string().trim().max(160).optional().transform((v) => v || undefined),
+  projectTitle: z.string().trim().max(200).optional().transform((v) => v || undefined),
+  evaluationGrade: z.string().trim().max(40).optional().transform((v) => v || undefined),
+  attendancePercentage: z.string().trim().max(20).optional().transform((v) => v || undefined),
+  certificateStatus: z.string().trim().optional().transform((v) => {
+    const u = (v ?? "").toUpperCase();
+    if (["ISSUED", "VERIFIED", "UNDER_REVIEW", "NOT_ISSUED"].includes(u)) return u as "ISSUED" | "VERIFIED" | "UNDER_REVIEW" | "NOT_ISSUED";
+    return "UNDER_REVIEW";
+  }),
+  certificateUrl: z.string().trim().optional().transform((v) => v || undefined),
+  evaluationRemarks: z.string().trim().max(500).optional().transform((v) => v || undefined),
   trainingCodes: z.array(z.string()).max(4).default([]),
 });
 export const studentInputSchema = studentInputBaseSchema.superRefine((value, ctx) => {
@@ -64,7 +75,26 @@ export async function createStudentRecord(raw: unknown) {
   try {
     await session.withTransaction(async () => {
       const [user] = await User.create([{ identifier: input.rollNumber.toLowerCase(), passwordHash: await bcrypt.hash(randomBytes(48).toString("base64url"), 12), role: "STUDENT", status: "ACTIVE", mustChangePassword: true }], { session });
-      const [student] = await Student.create([{ user: user._id, fullName: input.fullName, rollNumber: input.rollNumber, registrationNumber: input.registrationNumber, email: input.email, department: input.department, semester: input.semester, academicYear: input.academicYear, cgpa: input.cgpa, contactNumber: input.contactNumber, status: "ACTIVE" }], { session });
+      const [student] = await Student.create([{
+        user: user._id,
+        fullName: input.fullName,
+        rollNumber: input.rollNumber,
+        registrationNumber: input.registrationNumber,
+        email: input.email,
+        department: input.department,
+        semester: input.semester,
+        academicYear: input.academicYear,
+        cgpa: input.cgpa,
+        contactNumber: input.contactNumber,
+        companyName: input.companyName ?? "",
+        projectTitle: input.projectTitle ?? "",
+        evaluationGrade: input.evaluationGrade ?? "Under Evaluation",
+        attendancePercentage: input.attendancePercentage ?? "100%",
+        certificateStatus: input.certificateStatus ?? "UNDER_REVIEW",
+        certificateUrl: input.certificateUrl ?? "",
+        evaluationRemarks: input.evaluationRemarks ?? "",
+        status: "ACTIVE"
+      }], { session });
       studentId = student._id.toString();
       await User.updateOne({ _id: user._id }, { $set: { student: student._id } }, { session });
       if (trainings.length) await Enrollment.insertMany(trainings.map((training) => ({ student: student._id, training: training._id, status: "ACTIVE", assignedBy: new Types.ObjectId(principal.userId), assignmentHistory: [{ action: "ASSIGNED", actor: new Types.ObjectId(principal.userId), occurredAt: new Date(), note: "Initial student creation" }] })), { session });

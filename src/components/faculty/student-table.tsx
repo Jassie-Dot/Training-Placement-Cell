@@ -16,6 +16,31 @@ const baseColumns = [
   helper.accessor("submitted", { header: "Reports Submitted" }), helper.accessor("approved", { header: "Approved" }),
   helper.accessor("pending", { header: "Pending" }), helper.accessor("status", { header: "Training Status", cell: (info) => <span className={`status-pill${info.getValue() === "ACTIVE" ? " active" : ""}`}>{info.getValue()}</span> }),
   helper.display({ id: "training", header: "Training", cell: (info) => info.row.original.trainingLabels?.join(", ") || "—" }),
+  helper.display({
+    id: "actions",
+    header: "Mirror View",
+    cell: (info) => (
+      <Link
+        href={`/faculty/students/${info.row.original.id}/preview`}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "5px",
+          padding: "5px 11px",
+          borderRadius: "20px",
+          background: "rgba(37, 99, 235, 0.12)",
+          color: "#1d4ed8",
+          fontWeight: 700,
+          fontSize: "12px",
+          textDecoration: "none",
+          border: "1px solid rgba(37, 99, 235, 0.25)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        👁️ View as Student
+      </Link>
+    ),
+  }),
 ] as ColumnDef<Row>[];
 
 export function StudentTable({ data, total, page, pageSize, query, code, departments, hideTraining = false }: { data: Row[]; total: number; page: number; pageSize: number; query: Record<string, string | undefined>; code?: string; departments: string[]; hideTraining?: boolean }) {

@@ -12,6 +12,13 @@ const studentSchema = new Schema({
   academicYear: { type: String, trim: true, maxlength: 20, default: null },
   cgpa: { type: Number, min: 0, max: 10, default: null },
   contactNumber: { type: String, trim: true, maxlength: 24 },
+  companyName: { type: String, trim: true, maxlength: 160, default: "" },
+  projectTitle: { type: String, trim: true, maxlength: 200, default: "" },
+  evaluationGrade: { type: String, trim: true, maxlength: 40, default: "Under Evaluation" },
+  attendancePercentage: { type: String, trim: true, maxlength: 20, default: "100%" },
+  certificateStatus: { type: String, enum: ["NOT_ISSUED", "UNDER_REVIEW", "ISSUED", "VERIFIED"], default: "UNDER_REVIEW" },
+  certificateUrl: { type: String, trim: true, default: "" },
+  evaluationRemarks: { type: String, trim: true, maxlength: 500, default: "" },
   status: { type: String, enum: ["ACTIVE", "INACTIVE", "GRADUATED"], default: "ACTIVE", index: true },
   deletedAt: { type: Date, default: null, index: true },
 }, { timestamps: true, collection: "students" });
