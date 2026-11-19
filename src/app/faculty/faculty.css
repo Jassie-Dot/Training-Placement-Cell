@@ -822,8 +822,7 @@
   flex-wrap: wrap;
   flex: 1;
 }
-.data-toolbar input,
-.data-toolbar select {
+.data-toolbar input {
   height: 38px;
   padding: 0 12px;
   border: 1px solid #cbd5e1;
@@ -832,6 +831,26 @@
   color: #0f172a;
   font-size: 13px;
   outline: 0;
+  transition: all 0.2s;
+}
+.data-toolbar select {
+  height: 38px;
+  padding: 0 32px 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 500;
+  outline: 0;
+  cursor: pointer;
   transition: all 0.2s;
 }
 .data-toolbar input:focus,
@@ -1243,7 +1262,6 @@
   color: #334155;
 }
 .form-grid input,
-.form-grid select,
 .form-grid textarea {
   height: 42px;
   padding: 0 12px;
@@ -1253,6 +1271,26 @@
   color: #0f172a;
   font-size: 13.5px;
   outline: 0;
+  transition: all 0.2s;
+}
+.form-grid select {
+  height: 42px;
+  padding: 0 34px 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 15px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  color: #0f172a;
+  font-size: 13.5px;
+  font-weight: 500;
+  outline: 0;
+  cursor: pointer;
   transition: all 0.2s;
 }
 .form-grid input:focus,

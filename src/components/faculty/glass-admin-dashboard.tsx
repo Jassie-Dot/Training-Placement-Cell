@@ -28,6 +28,7 @@ import { StatCard } from "@/components/faculty/stat-card";
 import { ReportStatusChart, TrainingDistributionChart } from "@/components/faculty/dashboard-charts";
 import { RecentActivity } from "@/components/faculty/recent-activity";
 import { ImportForm } from "@/app/faculty/(portal)/students/import/import-form";
+import { CustomSelect } from "@/components/ui/custom-select";
 import type { AllStudentTableRow } from "@/lib/faculty/student-query";
 import type { FacultyOverview } from "@/lib/faculty/dashboard-data";
 
@@ -289,34 +290,36 @@ export function GlassAdminDashboard({
               </div>
 
               <div className="client-filters-row">
-                <select
-                  value={selectedDept}
-                  onChange={(e) => setSelectedDept(e.target.value)}
-                  className="client-filter-select"
-                >
-                  <option value="ALL">All Departments</option>
-                  {departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
+                <div style={{ minWidth: "170px" }}>
+                  <CustomSelect
+                    name="selectedDept"
+                    value={selectedDept}
+                    onChange={(val) => setSelectedDept(val)}
+                    options={[
+                      { value: "ALL", label: "All Departments" },
+                      ...departments.map((dept) => ({ value: dept, label: dept })),
+                    ]}
+                  />
+                </div>
 
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="client-filter-select"
-                >
-                  <option value="ALL">All Statuses</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                  <option value="GRADUATED">Graduated</option>
-                </select>
+                <div style={{ minWidth: "150px" }}>
+                  <CustomSelect
+                    name="selectedStatus"
+                    value={selectedStatus}
+                    onChange={(val) => setSelectedStatus(val)}
+                    options={[
+                      { value: "ALL", label: "All Statuses" },
+                      { value: "ACTIVE", label: "Active" },
+                      { value: "INACTIVE", label: "Inactive" },
+                      { value: "GRADUATED", label: "Graduated" },
+                    ]}
+                  />
+                </div>
 
                 <button
                   className="faculty-button primary"
                   onClick={() => setActiveTab("import")}
-                  style={{ padding: "8px 14px", fontSize: "12px" }}
+                  style={{ padding: "8px 14px", fontSize: "12px", height: "42px" }}
                 >
                   <Upload size={14} />
                   <span>Import via Excel</span>

@@ -572,3 +572,119 @@ button, a { -webkit-tap-highlight-color: transparent; }
     padding: 24px;
   }
 }
+
+/* =========================================================================
+   UNIVERSAL SLEEK DROPDOWN MENU STYLING
+========================================================================= */
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 15px;
+  padding: 8px 36px 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  min-height: 42px;
+}
+
+select:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background-color: #fafbfc;
+}
+
+select:focus {
+  border-color: #0f2b48;
+  box-shadow: 0 0 0 3px rgba(15, 43, 72, 0.1);
+}
+
+select:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  padding: 10px 12px;
+}
+
+/* Column Picker & Custom Popover Menus */
+details.column-picker {
+  position: relative;
+  display: inline-block;
+}
+details.column-picker summary {
+  cursor: pointer;
+  padding: 8px 14px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  transition: all 0.15s ease;
+  user-select: none;
+  list-style: none;
+}
+details.column-picker summary::-webkit-details-marker {
+  display: none;
+}
+details.column-picker summary:hover {
+  background: #fafbfc;
+  border-color: #94a3b8;
+}
+details.column-picker[open] summary {
+  border-color: #0f2b48;
+  box-shadow: 0 0 0 3px rgba(15, 43, 72, 0.1);
+}
+.column-picker-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 100;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: selectFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.column-picker-menu label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  color: #334155;
+  user-select: none;
+}
+.column-picker-menu label:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+

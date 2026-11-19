@@ -14,6 +14,7 @@ import {
   Mail,
   User,
 } from "lucide-react";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 export function StudentRegistrationForm() {
   const [loading, setLoading] = useState(false);
@@ -52,7 +53,7 @@ export function StudentRegistrationForm() {
           rollNumber: form.get("rollNumber"),
           email,
           trainingCode: form.get("trainingCode") || "TR-101",
-          semester: form.get("semester"),
+          semester: form.get("semester") || "3",
           password,
         }),
       });
@@ -157,16 +158,17 @@ export function StudentRegistrationForm() {
                 </div>
               </div>
 
-              <div className="form-group w-32">
+              <div className="form-group w-36">
                 <label htmlFor="semester">Semester</label>
-                <div className="input-wrap select-wrap">
-                  <select id="semester" name="semester" required defaultValue="3">
-                    <option value="" disabled>Select</option>
-                    {Array.from({ length: 8 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>Sem {i + 1}</option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  id="semester"
+                  name="semester"
+                  defaultValue="3"
+                  options={Array.from({ length: 8 }, (_, i) => ({
+                    value: String(i + 1),
+                    label: `Sem ${i + 1}`,
+                  }))}
+                />
               </div>
             </div>
 
@@ -193,15 +195,18 @@ export function StudentRegistrationForm() {
 
             <div className="form-group">
               <label htmlFor="trainingCode">Training Program</label>
-              <div className="input-wrap select-wrap">
-                <BookOpen size={16} className="input-icon" />
-                <select id="trainingCode" name="trainingCode" required defaultValue="TR-101">
-                  <option value="TR-101">TR-101</option>
-                  <option value="TR-102">TR-102</option>
-                  <option value="TR-103">TR-103</option>
-                  <option value="TR-104">TR-104</option>
-                </select>
-              </div>
+              <CustomSelect
+                id="trainingCode"
+                name="trainingCode"
+                defaultValue="TR-101"
+                icon={<BookOpen size={16} />}
+                options={[
+                  { value: "TR-101", label: "TR-101", description: "Industrial Training I" },
+                  { value: "TR-102", label: "TR-102", description: "Institutional Training" },
+                  { value: "TR-103", label: "TR-103", description: "Industrial Training II" },
+                  { value: "TR-104", label: "TR-104", description: "Semester Training" },
+                ]}
+              />
             </div>
 
             <div className="form-row">
@@ -442,7 +447,7 @@ const cleanRegisterStyles = `
   line-height: 1.35;
 }
 .flex-1 { flex: 1; }
-.w-32 { width: 130px; }
+.w-36 { width: 140px; }
 
 .input-wrap {
   display: flex;
@@ -459,8 +464,7 @@ const cleanRegisterStyles = `
   border-color: #0f2b48;
   box-shadow: 0 0 0 3px rgba(15, 43, 72, 0.1);
 }
-.input-wrap input,
-.input-wrap select {
+.input-wrap input {
   width: 100%;
   height: 100%;
   border: 0;
@@ -469,15 +473,6 @@ const cleanRegisterStyles = `
   color: #0f172a;
   font-size: 13px;
   font-family: inherit;
-}
-.select-wrap select {
-  cursor: pointer;
-  background-color: #ffffff;
-}
-.select-wrap select option {
-  color: #0f172a;
-  background-color: #ffffff;
-  padding: 6px;
 }
 .input-wrap input::placeholder {
   color: #9ca3af;
@@ -576,7 +571,7 @@ const cleanRegisterStyles = `
     flex-direction: column;
     gap: 14px;
   }
-  .w-32 {
+  .w-36 {
     width: 100%;
   }
 }
