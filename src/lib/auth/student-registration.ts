@@ -6,15 +6,18 @@ import { connectMongo } from "@/lib/db/mongoose";
 import { studentEmailSchema } from "@/lib/auth/validation";
 import { User } from "@/models/user";
 import { Student } from "@/models/student";
+import { Training } from "@/models/training";
+import { Enrollment } from "@/models/enrollment";
 import { AuditLog } from "@/models/audit-log";
 
 const registrationSchema = z.object({
-  fullName: z.string().trim().min(2).max(160),
-  rollNumber: z.string().trim().min(1).max(40).transform((value) => value.toUpperCase()),
+  fullName: z.string().trim().min(2, "Full name must be at least 2 characters.").max(160),
+  rollNumber: z.string().trim().min(1, "Roll number is required.").max(40).transform((value) => value.toUpperCase()),
   email: studentEmailSchema,
-  department: z.string().trim().min(1).max(100),
+  trainingCode: z.enum(["TR-101", "TR-102", "TR-103", "TR-104"]).default("TR-101"),
+  department: z.string().trim().max(100).optional().default("General"),
   semester: z.coerce.number().int().min(1).max(12),
-  password: z.string().min(6).max(72),
+  password: z.string().min(6, "Password must be at least 6 characters.").max(72),
 });
 
 export type StudentRegistrationInput = z.infer<typeof registrationSchema>;
@@ -34,6 +37,22 @@ export async function createStudentAccount(input: StudentRegistrationInput) {
 
   const existingRoll = await Student.findOne({ rollNumber: input.rollNumber.toUpperCase(), deletedAt: null });
   if (existingRoll) return { created: false as const, error: "An account with this roll number already exists." };
+
+  // Ensure chosen training program exists
+  let training = await Training.findOne({ code: input.trainingCode });
+  if (!training) {
+    try {
+      training = await Training.create({
+        code: input.trainingCode,
+        name: input.trainingCode,
+        description: `Training Program ${input.trainingCode}`,
+        reportingFrequencyDays: 15,
+        status: "ACTIVE",
+      });
+    } catch {
+      training = await Training.findOne({ code: input.trainingCode });
+    }
+  }
 
   const passwordHash = await bcrypt.hash(input.password, 12);
   let userId = "";
@@ -57,19 +76,35 @@ export async function createStudentAccount(input: StudentRegistrationInput) {
           fullName: input.fullName,
           rollNumber: input.rollNumber,
           email: input.email.toLowerCase(),
-          department: input.department,
+          department: input.department || "General",
           semester: input.semester,
           status: "ACTIVE",
         }], { session });
 
         await User.updateOne({ _id: user._id }, { $set: { student: student._id } }, { session });
+
+        if (training) {
+          await Enrollment.create([{
+            student: student._id,
+            training: training._id,
+            status: "ACTIVE",
+            assignedBy: user._id,
+            assignmentHistory: [{
+              action: "ASSIGNED",
+              actor: user._id,
+              occurredAt: new Date(),
+              note: `Student self-enrolled into ${input.trainingCode}`,
+            }],
+          }], { session });
+        }
+
         await AuditLog.create([{
           actor: null,
           action: "STUDENT_SELF_REGISTERED",
           entityType: "student",
           entityId: student._id,
           occurredAt: new Date(),
-          metadata: { verificationRequired: false },
+          metadata: { verificationRequired: false, trainingCode: input.trainingCode },
         }], { session });
 
         userId = user._id.toString();
@@ -94,19 +129,35 @@ export async function createStudentAccount(input: StudentRegistrationInput) {
       fullName: input.fullName,
       rollNumber: input.rollNumber,
       email: input.email.toLowerCase(),
-      department: input.department,
+      department: input.department || "General",
       semester: input.semester,
       status: "ACTIVE",
     });
 
     await User.updateOne({ _id: user._id }, { $set: { student: student._id } });
+
+    if (training) {
+      await Enrollment.create({
+        student: student._id,
+        training: training._id,
+        status: "ACTIVE",
+        assignedBy: user._id,
+        assignmentHistory: [{
+          action: "ASSIGNED",
+          actor: user._id,
+          occurredAt: new Date(),
+          note: `Student self-enrolled into ${input.trainingCode}`,
+        }],
+      });
+    }
+
     await AuditLog.create({
       actor: null,
       action: "STUDENT_SELF_REGISTERED",
       entityType: "student",
       entityId: student._id,
       occurredAt: new Date(),
-      metadata: { verificationRequired: false },
+      metadata: { verificationRequired: false, trainingCode: input.trainingCode },
     });
 
     userId = user._id.toString();

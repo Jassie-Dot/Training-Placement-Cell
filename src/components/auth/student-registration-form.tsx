@@ -2,7 +2,18 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, GraduationCap, LoaderCircle, Lock, Mail, User } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  GraduationCap,
+  LoaderCircle,
+  Lock,
+  Mail,
+  User,
+} from "lucide-react";
 
 export function StudentRegistrationForm() {
   const [loading, setLoading] = useState(false);
@@ -15,11 +26,22 @@ export function StudentRegistrationForm() {
     event.preventDefault();
     setError("");
     setSuccess("");
+
     if (password !== confirmPassword) {
       setError("Passwords do not match. Please verify both password entries.");
       return;
     }
+
     const form = new FormData(event.currentTarget);
+    const email = String(form.get("email") || "").trim().toLowerCase();
+
+    if (!email.endsWith("@gndec.ac.in")) {
+      setError(
+        "Only official @gndec.ac.in email addresses are accepted (e.g. name@gndec.ac.in). Personal emails (Gmail, Yahoo, etc.) are strictly prohibited."
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch("/api/auth/student/register", {
@@ -28,8 +50,8 @@ export function StudentRegistrationForm() {
         body: JSON.stringify({
           fullName: form.get("fullName"),
           rollNumber: form.get("rollNumber"),
-          email: form.get("email"),
-          department: form.get("department"),
+          email,
+          trainingCode: form.get("trainingCode") || "TR-101",
           semester: form.get("semester"),
           password,
         }),
@@ -149,7 +171,7 @@ export function StudentRegistrationForm() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="email">Official College Email Address</label>
               <div className="input-wrap">
                 <Mail size={16} className="input-icon" />
                 <input
@@ -159,22 +181,26 @@ export function StudentRegistrationForm() {
                   autoComplete="email"
                   required
                   maxLength={254}
-                  placeholder="name@gndec.ac.in or personal email"
+                  pattern="[a-zA-Z0-9._%+\-]+@gndec\.ac\.in$"
+                  title="Only official @gndec.ac.in email addresses are accepted."
+                  placeholder="rollnumber@gndec.ac.in or name@gndec.ac.in"
                 />
               </div>
+              <span className="field-hint">
+                Only institutional @gndec.ac.in email addresses are accepted. Personal emails are rejected.
+              </span>
             </div>
 
             <div className="form-group">
-              <label htmlFor="department">Department / Branch</label>
-              <div className="input-wrap">
-                <input
-                  id="department"
-                  name="department"
-                  required
-                  maxLength={100}
-                  placeholder="e.g. Information Technology"
-                  defaultValue="Information Technology"
-                />
+              <label htmlFor="trainingCode">Training Program</label>
+              <div className="input-wrap select-wrap">
+                <BookOpen size={16} className="input-icon" />
+                <select id="trainingCode" name="trainingCode" required defaultValue="TR-101">
+                  <option value="TR-101">TR-101</option>
+                  <option value="TR-102">TR-102</option>
+                  <option value="TR-103">TR-103</option>
+                  <option value="TR-104">TR-104</option>
+                </select>
               </div>
             </div>
 
@@ -409,6 +435,12 @@ const cleanRegisterStyles = `
   font-weight: 700;
   color: #334155;
 }
+.field-hint {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+  line-height: 1.35;
+}
 .flex-1 { flex: 1; }
 .w-32 { width: 130px; }
 
@@ -437,6 +469,15 @@ const cleanRegisterStyles = `
   color: #0f172a;
   font-size: 13px;
   font-family: inherit;
+}
+.select-wrap select {
+  cursor: pointer;
+  background-color: #ffffff;
+}
+.select-wrap select option {
+  color: #0f172a;
+  background-color: #ffffff;
+  padding: 6px;
 }
 .input-wrap input::placeholder {
   color: #9ca3af;
